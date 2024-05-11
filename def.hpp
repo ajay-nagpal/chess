@@ -24,7 +24,6 @@ if(!(n)){\
 
 #endif
 
-
 typedef unsigned long long u64;
 
 #define name "vice 1.0"
@@ -91,11 +90,7 @@ class s_board {
     vector<int>material=vector<int>(3);
 
     vector<s_undo>history=vector<s_undo>(maxmoves);
-    // what ever move number is we are now at 
-    // we will store the prev move information of s_undo things like
-    // the move about to made   , castle perission before the move was made
-    // enpas sq if was set before the move was made
-    
+   
     vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
 
     public:
@@ -142,7 +137,6 @@ class s_move_list{
     void set_count(int ct){count=ct;}
 };
 
-
 #define from_sq(m)    ((m) & 0x7F )
 #define to_sq(m)    (((m)>>7) & 0x7F )
 
@@ -171,5 +165,84 @@ class s_move_list{
 #define is_rq(p) (piece_rook_queen[(p)])
 #define is_kn(p) (piece_knight[(p)])
 #define is_ki(p) (piece_king[(p)])
+
+extern vector<int> sq120to64;
+extern vector<int> sq64to120;
+
+extern vector<u64> setmask;
+extern vector<u64> clearmask;
+
+extern vector<vector<u64>> piece_keys;
+
+extern vector<vector<unsigned long long >> piece_keys2;
+extern u64 side_key;
+
+extern vector<u64> castle_keys;
+
+extern string piece_char;
+extern string side_char;
+extern string rank_char;
+extern string file_char;
+
+extern vector<bool> piece_big;
+extern vector<bool> piece_major;
+extern vector<bool> piece_minor;
+extern vector<int> piece_value;
+extern vector<int> piece_color;
+
+extern vector<bool> piece_pawn;
+
+extern vector<int> file_board;
+extern vector<int> rank_board;
+
+extern vector<bool> piece_knight;
+extern vector<bool> piece_king;
+extern vector<bool> piece_rook_queen;
+extern vector<bool> piece_bishop_queen;
+extern vector<bool> piece_slide;
+
+//init.cpp
+extern void AllInit();
+extern void init_file_rank_board();
+
+//billboard.cpp
+extern void print_bit_board(u64 bb);
+extern int popbit(u64 *bb);
+extern int countbit(u64 b);
+
+// hashkey.cpp
+extern u64 generate_pos_key(const s_board *pos);
+
+//board.cpp
+extern void reset_board(s_board *pos);
+extern int parse_fen(const char * fen ,s_board * pos);
+extern void print_board(const s_board *pos);
+extern void update_list_material(s_board *pos);
+extern int check_board(const s_board *pos);
+
+// attack.cpp
+extern int square_attacked(const int sq,const int side, const s_board *pos);
+
+//io.cpp
+extern char * print_move(const int move);
+extern char * print_sq(const int sq);
+extern void print_move_list(const s_movelist* list);
+
+// movegen.cpp
+extern void generate_all_moves(const s_board * pos,s_movelist * list);
+
+//validate.cpp
+extern int  sq_on_board(const int sq);
+extern int side_valid(const int side);
+extern int file_rank_valid(const int fr);
+extern int piece_valid_empty(const int piece);
+extern int piece_valid(const int piece);
+
+//makemove.cpp
+extern int make_move(s_board * pos,int move);
+extern void take_move(s_board *pos);
+
+//perft.cpp
+extern void perft_test(int depth, s_board *pos);
 
 #endif
