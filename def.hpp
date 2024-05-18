@@ -15,13 +15,12 @@ using namespace std;
 #define ASSERT(n) \
 if(!(n)){\
     cout<<#n<<" - failed ";\
-    cout<<"on "<<__DATE__;\
-    cout<<"at "<<__TIME__;\
-    cout<<"in file "<<__FILE__;\
+    cout<<" on "<<__DATE__;\
+    cout<<" at "<<__TIME__;\
+    cout<<" in file "<<__FILE__;\
     cout<<" at line "<<__LINE__;\
     exit(1);\
 }
-
 #endif
 
 typedef unsigned long long u64;
@@ -92,6 +91,7 @@ class s_board {
     vector<s_undo>history=vector<s_undo>(maxmoves);
    
     vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
+    // to search which color piece is on board or not faster method no need to loop complete 120 board
 
     public:
 
@@ -205,7 +205,7 @@ extern vector<bool> piece_slide;
 extern void AllInit();
 extern void init_file_rank_board();
 
-//billboard.cpp
+//bitboard.cpp
 extern void print_bit_board(u64 bb);
 extern int popbit(u64 *bb);
 extern int countbit(u64 b);
@@ -226,10 +226,10 @@ extern int square_attacked(const int sq,const int side, const s_board *pos);
 //io.cpp
 extern char * print_move(const int move);
 extern char * print_sq(const int sq);
-extern void print_move_list(const s_movelist* list);
+//extern void print_move_list(const s_movelist* list);
 
 // movegen.cpp
-extern void generate_all_moves(const s_board * pos,s_movelist * list);
+//extern void generate_all_moves(const s_board * pos,s_movelist * list);
 
 //validate.cpp
 extern int  sq_on_board(const int sq);

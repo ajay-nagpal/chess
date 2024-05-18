@@ -4,6 +4,8 @@
 #include"cstdlib"
 #include<vector>
 
+#include <iomanip>// for %5d soln
+
 using namespace std;
 
 // wiki fen page other 3 fen as example
@@ -77,65 +79,6 @@ using namespace std;
 int main(){
     AllInit();// it will contain all the things that we want to initialize in our program
     //return 0;
-
-    //array printing func
-
-    // for(int index=0;index<board_sq_num;index++){
-    //     if(index%10==0)
-    //         cout<<endl;
-
-    //     cout<<"     "<<sq120to64[index];// big 120  board print
-    // }
-
-   //cout<<endl;
-   //count<<endl;
-
-    // for(int index=0;index<64;index++){
-    //     if(index%8==0)
-    //         cout<<endl;
-
-    //     cout<<"     "<<sq64to120[index];// small 64 board print
-    // }
-
-    // cout<<endl;
-    // cout<<endl;
-
-    // int num=2;
-    // int nuts=4;
-
-    // ASSERT(num==nuts);
-
-
-    //demonstration of bitboard
-
-    //u64 play_bitboard=0ULL;
-
-    // // now print out bitboard
-    // cout<<"start: "<<endl;
-    // print_bit_board(play_bitboard);
-
-
-    // let now assume pawn on d2
-    //OR use krke krnge 2 ways 
-
-
-    // play_bitboard |= (1ULL<<SQ64(d2));// this set pawn for us on d2
-
-    // cout<<" d2 added:"<<endl;
-    // print_bit_board(play_bitboard);
-
-    
-    // now let add pawn on g2
-    // play_bitboard |= (1ULL<<SQ64(g2));
-    // cout<<"g2 added"<<endl;
-
-
-    // print_bit_board(play_bitboard);
-
-
-
-
-    // all these commnetsed code is for teaching purpose
 
     // in this we wiill count and identify bits from bitboard
     // u64 play_bitboard=0ULL;
@@ -554,35 +497,35 @@ int main(){
 
    // makemove testing
 
-   s_board board[1];
-   s_movelist list[1];
+  //  s_board board[1];
+  //  s_movelist list[1];
 
-   parse_fen(start_fen,board);
-   generate_all_moves(board,list);
+  //  parse_fen(start_fen,board);
+  //  generate_all_moves(board,list);
 
-   int move=0,move_num=0;
+  //  int move=0,move_num=0;
 
-   print_board(board);
-   getchar();
+  //  print_board(board);
+  //  getchar();
 
-   for(move_num=0;move_num<list->count;move_num++){// loop through moves
-        move=list->moves[move_num].move;
-        cout<<endl<<" move "<<move<<endl;
+  //  for(move_num=0;move_num<list->count;move_num++){// loop through moves
+  //       move=list->moves[move_num].move;
+  //       cout<<endl<<" move "<<move<<endl;
 
-        if(!make_move(board,move)){// return false if move is illegle
-            continue;
-        }
+  //       if(!make_move(board,move)){// return false if move is illegle
+  //           continue;
+  //       }
 
-        cout<<endl<<" made: "<<print_move(move)<<endl;// print the move to the screen
-        print_board(board);
+  //       cout<<endl<<" made: "<<print_move(move)<<endl;// print the move to the screen
+  //       print_board(board);
 
-        take_move(board);
-        cout<<endl<<" taken: "<<print_move(move)<<endl;
-        print_board(board);
+  //       take_move(board);
+  //       cout<<endl<<" taken: "<<print_move(move)<<endl;
+  //       print_board(board);
 
-        getchar();
+  //       getchar();
 
-   }
+  //  }
 
    
 
@@ -593,9 +536,6 @@ int main(){
 
     // parse_fen(start_fen,board);
     // perft_test(3,board);// depth 3 pr 8902 leaf nodes hote h data table se so lets see our output
-
-
-    return 0;
 
 }
 

@@ -1,5 +1,5 @@
 #include<iostream>
-#include"def.h"
+#include"def.hpp"
 #include<vector>
 
 using namespace std;
@@ -40,7 +40,7 @@ int countbit(u64 b){// counts and return the number of bits that are 1 inside a 
 // add these function in def.h so that we can use them  + macros 
 
 
-void print_bit_board(u64 bb){// add this func in def.h 
+void print_bit_board(u64 bb){
     u64 shiftme=1ULL;
 
     int rank=0;
@@ -48,38 +48,22 @@ void print_bit_board(u64 bb){// add this func in def.h
     int sq=0;
     int sq64=0;
 
-    // print krnge board ok isme rank 1 ,2 3 4 bottom se h jese original me hoti h
-    // thats why we will loop from 8 to 1
-
     cout<<endl;
 
     for(rank=r8;rank>=r1;rank--){
         for(file=fa;file<=fh;file++){
-            sq=fr_to_sq(file,rank);// 120 based index
+            sq=fr_to_sq(file,rank);
 
-            // we need 64 based index so use macro 
-            sq64=SQ64(sq);// using macro 
+            sq64=SQ64(sq);
 
-            // if a bit is set at our currr square
-            // then print X otherwise print -dash
-
-
-            // let e4 h,,55 index dega (120 based)  isse 64 base indx me 24 value
-            //use set kr denge   
-
-            // then we know if we shift iULL by 28 and then it return a non zero then we 
-            // can print an X otherwise dash(-)
-
-            if((shiftme<<sq64)& bb)// bb bitboard
+            if((shiftme<<sq64)& bb)
                 printf("X");
             else    
                 printf("-");
         }
         cout<<endl;
     }
-    cout<<endl;
-    cout<<endl;
-
+    cout<<endl<<endl;
 }
 
 
