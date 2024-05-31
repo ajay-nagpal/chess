@@ -1,11 +1,11 @@
 #include<iostream>
-#include"def.h"
+#include"def.hpp"
 #include<vector>
 
 using namespace std;
 
 string  piece_char=".PNBRQKpnbrqk";// dot for empty
-string side_char="wb-";
+string  side_char="wb-";
 string  rank_char="12345678";
 string  file_char="abcdefgh";
 

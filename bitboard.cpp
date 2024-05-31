@@ -15,30 +15,20 @@ const vector<int> bit_table{
     38,28,58,20,37,17,36,8
 };
 
-int popbit(u64 *bb){// it takes first bit starting at least significant bit
-    // in a bitboard and returns the index that this bit was set at
-    // so that we can know which square that the bit was set on
-    // and sets that bits then to zero
-
+int popbit(u64 *bb){
     u64 b= *bb ^(*bb-1);
-
     unsigned int fold=(unsigned) ((b &  0xffffffff)  ^ (b>>32));
-
     *bb &=(*bb -1);
 
     return bit_table[(fold * 0x783a9b23) >>26];
 }
 
-int countbit(u64 b){// counts and return the number of bits that are 1 inside a bitboard
+int countbit(u64 b){
     int r;
-
     for(r=0;b; r++ , b&=b-1);
         
     return r;
 }
-
-// add these function in def.h so that we can use them  + macros 
-
 
 void print_bit_board(u64 bb){
     u64 shiftme=1ULL;

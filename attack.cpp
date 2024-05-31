@@ -20,7 +20,7 @@ int square_attacked(const int sq,const int side, const s_board *pos){
 
     //pawns
     if(side==white){// if the attacking side is whitejese 55  to 44 ya 46 me se kisi pr white pawn to apna 55 white pawn se atatacked
-        if(pos->p==wp || pos->pieces[sq-9]==wp){
+        if(pos->pieces[sq-11]==wp || pos->pieces[sq-9]==wp){
             return true;
         }
     }

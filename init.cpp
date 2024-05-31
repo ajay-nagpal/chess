@@ -16,7 +16,7 @@ vector<int>sq64to120(64);
 vector<u64>setmask(64);
 vector<u64>clearmask(64);
 
-vector<vector<u64> >piece_keys(13,vector<u64>(120,0));
+vector<vector<u64> >piece_keys(13,vector<u64>(120));
 u64 side_key;
 int a=10;
 
@@ -101,7 +101,7 @@ void init_bitmask(){
 
 void initsq120to64(){
     int index=0;
-    int file=file::fa;
+    int file=fa;
     //int rank= rank::r1;
     int rank=r1;
 
