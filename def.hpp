@@ -1,5 +1,5 @@
-#ifndef def_h
-#define def_h
+#ifndef def_hpp
+#define def_hpp
 
 #include <cstdlib>
 #include <iostream>
@@ -93,10 +93,10 @@ class s_board {
 
     vector<int>piece_num=vector<int>(13);
 
-    vector<int>big_pieces=vector<int>(3);
-    vector<int>major_pieces=vector<int>(3);
-    vector<int>minor_pieces=vector<int>(3);
-    vector<int>material=vector<int>(3);
+    vector<int>big_pieces=vector<int>(2);
+    vector<int>major_pieces=vector<int>(2);
+    vector<int>minor_pieces=vector<int>(2);
+    vector<int>material=vector<int>(2);
 
     vector<s_undo>history=vector<s_undo>(maxmoves);
    

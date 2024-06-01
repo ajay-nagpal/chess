@@ -3,8 +3,8 @@
 #include<vector>
 
 using namespace std;
-const vector<int>knight_dir{-8,-19,-21,-12,8,19,21,12};
 
+const vector<int>knight_dir{-8,-19,-21,-12,8,19,21,12};
 const vector<int>rook_dir{-1,-10,1,10};
 const vector<int> bishop_dir{-9,-11,11,9};
 const vector<int> king_dir{-1,-10,1,10,-9,-11,11,9};

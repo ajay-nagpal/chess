@@ -2,6 +2,7 @@
 #include"def.hpp"
 #include<iostream>
 #include<vector>
+#include <iomanip>
 
 using namespace std;
 #define rand64 (    ((u64) rand() )    |\
@@ -26,7 +27,7 @@ vector<int>file_board(board_sq_num);
 vector<int>rank_board(board_sq_num);
 
 void init_file_rank_board(){
-    int index=0,file=f1,rank=r1;
+    int index=0,file=fa,rank=r1;
     int sq=a1,sq64=0;
 
     for(index=0;index<board_sq_num;index++){
@@ -42,28 +43,6 @@ void init_file_rank_board(){
             rank_board[sq]=rank;
         }
     }
-
-    // only for checking purpose that it is printing correctly
-    // no need in actual code
-
-    
-    // printf("fileboard:\n\n");
-
-    // for(index=0;index<board_sq_num;index++){
-    //     if(index%10==0 && index!=0)
-    //         printf("\n");
-        
-    //     printf("%4d",file_board[index]);
-    // }
-    // printf("\n\n");
-    // printf("rankboard:\n\n");
-
-    // for(index=0;index<board_sq_num;index++){
-    //     if(index%10==0 && index!=0)
-    //         printf("\n");
-        
-    //     printf("%4d",rank_board[index]);
-    // }
 }
 
 void inithashkey(){

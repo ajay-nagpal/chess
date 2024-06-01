@@ -24,8 +24,8 @@ u64 generate_pos_key(const s_board *pos){
     if(pos->enpass!=no_sq){
         ASSERT(pos->enpass>=0 && pos->enpass<board_sq_num);
 
-        //ASSERT(sq_on_board(pos->get_enpass()));
-		//ASSERT(rank_board[pos->get_enpass()] == r3 || rank_board[pos->get_enpass()] == r6);
+        //ASSERT(sq_on_board(pos->enpass));
+		//ASSERT(rank_board[pos->enpass] == r3 || rank_board[pos->enpass] == r6);
 
         finalkey ^= piece_keys[emptyy][pos->enpass];
     }

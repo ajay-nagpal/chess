@@ -1,4 +1,4 @@
-#include"def.h"
+#include"def.hpp"
 
 int  sq_on_board(const int sq){
     return file_board[sq]==OFFBOARD?0:1;

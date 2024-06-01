@@ -14,7 +14,7 @@ using namespace std;
 //#define fen1 "8/3q4/8/8/4Q3/8/8/8 w - - 0 2 "
 #define fen2 "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
 #define fen3 "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
-//#define fen4 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+#define fen4 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
 #define pawnmoves_w "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1"
 #define pawnmoves_b "rnbqkbnr/p1p1p3/3p3p/1p1p4/2P1Pp2/8/PP1P1PpP/RNBQKB1R b KQkq e3 0 1"
@@ -79,69 +79,6 @@ using namespace std;
 int main(){
     AllInit();
     //return 0;
-
-    // board.c ke fen functions ki testing phase
-
-    s_board board[1];
-
-    parse_fen(start_fen,board);
-    print_board(board);
-
-    parse_fen(fen1,board);
-    print_board(board);
-
-    parse_fen(fen2,board);
-    print_board(board);
-
-    parse_fen(fen3,board);
-    print_board(board);
-
-    
-
-    // fen 4 piece list ka code
-
-//     s_board board[1];
-
-//     parse_fen(fen4,board);
-//     cout<<endl<<" BOARD:"<<endl;
-//     print_board(board);
-
-//     cout<<endl<<" wp:"<<endl;
-//     print_bit_board(board->pawns[white]);
-
-//     cout<<endl<<" bp:"<<endl;
-//     print_bit_board(board->pawns[black]);
-
-//     cout<<endl<<" all p:"<<endl;
-//     print_bit_board(board->pawns[both]);
-//     return 0;
-
-    
-    
-    // checking the checckboard function
-    // s_board board[1];
-
-    // parse_fen(fen4,board);
-    // cout<<endl<<" board"<<endl;
-    // print_board(board);
-
-    // ASSERT(check_board(board));
-
-    // no assert fails here and print everything correctly
-
-    // but now let fails assert 
-
-    // let reduuce the number of pawns in the piece numbers in the positions
-
-    // cout<<endl<<" forced assert "<<endl;
-    // board->piece_num[wp]--;
-    // ASSERT(check_board(board));
-    // print_board(board);
-
-    // cout<<endl<<" forced assert "<<endl;
-    // board->poskey^=side_key;
-    // ASSERT(check_board(board));
-
 
 
 

@@ -47,9 +47,9 @@ void print_bit_board(u64 bb){
             sq64=SQ64(sq);
 
             if((shiftme<<sq64)& bb)
-                printf("X");
+                cout<<"X";
             else    
-                printf("-");
+                cout<<"-";
         }
         cout<<endl;
     }
