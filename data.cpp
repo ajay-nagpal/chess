@@ -28,11 +28,11 @@ vector<int>piece_color{both,white,white,white,white,white,white,black,black,blac
 
 vector<bool>piece_pawn{ false, true, false, false, false, false, false, true, false, false, false, false, false };
 	
-vector<bool>piece_knight{ false, false, true, false, false, false, false, false, true, false, false, false, false };
-vector<bool>piece_king{ false, false, false, false, false, false, true, false, false, false, false, false, true };
-vector<bool>piece_rook_queen{ false, false, false, false, true, true, false, false, false, false, true, true, false };
+vector<bool>piece_knight      { false, false, true, false, false, false, false, false, true, false, false, false, false };
+vector<bool>piece_king        { false, false, false, false, false, false, true, false, false, false, false, false, true };
+vector<bool>piece_rook_queen  { false, false, false, false, true, true, false, false, false, false, true, true, false };
 vector<bool>piece_bishop_queen{ false, false, false, true, false, true, false, false, false, true, false, true, false };
-vector<bool>piece_slide{ false, false, false, true, true, true, false, false, false, true, true, true, false };
+vector<bool>piece_slide       { false, false, false, true, true, true, false, false, false, true, true, true, false };
 // it is true where th epiece is sliding piece like queen rook bishop
 
 

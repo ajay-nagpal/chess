@@ -1,34 +1,16 @@
-#include"def.h"
+#include"def.hpp"
 #include<iostream>
-#include<vector>
-
 using namespace std;
 
-// fun to print a move in algebrcc notation to the board
-
-
-// algebric
-
-// let square b2 h 32 pr
-// then let i am making move b2 to b4   then in algebric notationn will be b2b4
-// let promoting a pawn y with g7 and g8   alge notation will be g7g8
-// if promoted to queen the add q , b, r n   for bishop knight rook  
-
-
-// square strign  to print sq
 char * print_sq(const int sq){
-    static char sqstr[3];// cz we will be using the infrormation stored in array outisde of this function
-    // static isliye taki return ke baaad bhi exist
-    int file=file_board[sq];
+    static char sqstr[3];
+    int file=file_board[sq];// 0 to 7 ke file rank dega
     int rank=rank_board[sq];
 
-    sprintf(sqstr, "%c%c" , ('a'+file),('1'+rank));// char +int to char int me promote hogaand  uska ascii+rank ans
-    // but but %c  h to vo '1'+7=='8' hoga
-    
+    // sprintf to char * chiye to char array hi use
+    snprintf(sqstr,sizeof(sqstr), "%c%c" , ('a'+file),('1'+rank));
     return sqstr;
 }
-
-// now print move fun
 
 char * print_move(const int move){
     static char mvstr[6];
@@ -39,7 +21,7 @@ char * print_move(const int move){
     int ft=file_board[to_sq(move)];
     int rt=rank_board[to_sq(move)];
 
-    cout<<endl<<"ff "<<ff<<" rf "<<rf<<" ft "<<ft<<" rt "<<rt<<endl;
+    cout<<endl<<"ff "<<ff<<endl<<" rf "<<rf<<endl<<" ft "<<ft<<endl<<" rt "<<rt<<endl;
 
     // what piece we promoted to if any
     int promoted=promoted(move);
@@ -54,10 +36,10 @@ char * print_move(const int move){
         else if(!is_rq(promoted) &&  is_bq(promoted))
             pchar='b';
 
-        sprintf(mvstr, "%c%c%c%c%c",('a'+ff),('1'+rf),('a'+ft),('1'+rt),pchar);
+        snprintf(mvstr,sizeof(mvstr), "%c%c%c%c%c",('a'+ff),('1'+rf),('a'+ft),('1'+rt),pchar);
     }
     else{
-        sprintf(mvstr, "%c%c%c%c",('a'+ff),('1'+rf),('a'+ft),('1'+rt));
+        snprintf(mvstr, sizeof(mvstr),"%c%c%c%c",('a'+ff),('1'+rf),('a'+ft),('1'+rt));
     }
 
     return mvstr;
@@ -72,8 +54,8 @@ void print_move_list(const s_movelist* list){
         move=list->moves[index].move;
         score=list->moves[index].score;
 
-        printf("move:%d > %s (score: %d)\n",index+1,print_move(move),score);
+        cout<<"move "<<index+1<< " "<< print_move(move)<<endl<<"score " <<score<<endl;
     }
 
-    printf("movelist total %d moves:\n",list->count);
+    cout<<"movelist total " <<list->count<<" moves"<<endl;
 }

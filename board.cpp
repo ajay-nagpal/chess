@@ -110,9 +110,6 @@ int parse_fen( const char* fen ,s_board * pos){
         ASSERT(rank>=r1 && rank<=r8);
      
         pos->enpass=(fr_to_sq(file,rank));// to set enpass
-        
-        printf("%d \n ",pos->enpass);
-        cout<<(pos->enpass)<<endl;
     }
 
     pos->poskey=generate_pos_key(pos);
@@ -184,10 +181,9 @@ void print_board(const s_board *pos){
     cout<<endl;
 
     cout<<"side:"<<side_char[pos->side]<<endl;
-    printf("enpass %d\n",pos->enpass);
-    
+    cout<<dec;
     cout<<"enpass:"<<(pos->enpass)<<endl;
-
+    
     cout<<"castle: "<<((pos->castle_perm & wkca) ?'K':'-')<<
                                 (pos->castle_perm & wqca ?'Q':'-')<<
                                 (pos->castle_perm & bkca ?'k':'-')<<
@@ -195,6 +191,7 @@ void print_board(const s_board *pos){
     cout<<endl;
   
     cout<<"poskey:"<<setw(11)<<hex<<uppercase<<pos->poskey<<endl;
+    cout<<dec;
 }
 
 void update_list_material(s_board *pos){
@@ -335,10 +332,6 @@ int check_board(const s_board *pos){
     // position key should be same sas freshly generated key
     ASSERT(generate_pos_key(pos)==pos->poskey);//vid 20 9:00 se
 
-    // if enpass square is either no square or it f the side to move is white then it should be on rank 6 
-    // and if side to move is black then enpass sq must be on sq somewhere in rank 3
-
-    //cz enpass nossq nhi h to rank 6 ya rank 3
     ASSERT(pos->enpass==no_sq || (rank_board[pos->enpass]==r6 && pos->side==white)
             || (rank_board[pos->enpass]==r3 && pos->side==black));
 

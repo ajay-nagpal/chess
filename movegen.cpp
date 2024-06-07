@@ -1,95 +1,18 @@
-// imp steps to remember
-
-/*
-// making a  move 
-
-
-1 make(move)  // function make which take integer move  it will also take a pointer to our position
-
-2 get the from,to,cap from the move
-3 store the current position in the pos->istory array  like we store key for a position,
-    we store move being made, castele perm , fifty move etc  
-
-4 move the current piece from pieces araray ,from sq (to)->to sq
-5 if a capture was made, remove captured from the piece list// piece list array me se jo s_board me h
-    and also reduce the piece number formiece num array
-
-6 update fifty move rule, see if pawn was moved
-7 promotions// if promoted thn remove the pawn from the piece list then add a knight/ rook / queen ./ bisjhop
-    of the correct color into the piece list array
-
-8 enpass captures( ise hmne capture section me nhi liya  obviously we need to remove the pawn
-    that was captured and remove it from piece list as well)
-
-9 set enpas square is pawn start.  if a pawn is moved adn we fined that pawn is moved two squares
-    then we need to set our enpass square
-
-10 (reiterate here )for all pieces added, moved removed , update
-    all position counters and piece list  adjust the piece number,  keep track of major mini=or big pieces
-    material count
-
-11 maintain poskey  (cz every time a piece changfestate on board   either move or added or taken away
-    we need to xor piece out completely or the piece out on the square it was on  and in on the square
-    it has gone to)
-
-12 dont forget castle permission  (every move that is made we are basically perfirming a bitwise AND 
-    operation with an array where only the squares e8, h8,8 and e1,h1,a1  wheather the rooks and the
-    kings sit   have values different than 15   , so if one of the moves it moves   it adjust automatically
-    the castle permission)
-
-13 change side, increment ply and hisply  (we have to change the side when the move is made, we have to
-    increment the ply  so the number of half moves  made in a current search  and also hisply  ie in 
-    overall game history's half move made from the star tof the game)
-
-*/
-
 #include<iostream>
-#include"def.h"
+#include"def.hpp"
 #include<vector>
 
 using namespace std;
 
-// yha t bracket me isliye kuki sq+9 bheja jese to + and >> takraav to () best
-#define move(f,t,ca,pro,flag) ((f)|((t)<<7)|(ca<<14)|(pro<<20)|(flag))// creating a move integer
-#define square_offboard(sq) (file_board[(sq)]==OFFBOARD)// is the sq offboard or not
-// apn ne validate me fun bhi create kiya h but ye easy
-
-
-//for sliding pieces
-// pawns me kafi move h  cap promote etc to black white donon ko separate kiya 
-// pr jese ab sliding pieces ka krna ho  bisop rook queen
-// to dono ko sath krenge 
-// to ek array em lemnge white black bishop queeen rook   aur ese lemnge ki jb white ke 3 kr le to kuch
-// stope aaye fir balack ka aayearray me taki pta lagas ke
-
+#define move(f,t,ca,pro,flag) ((f)|((t)<<7)|(ca<<14)|(pro<<20)|(flag))
+#define square_offboard(sq) (file_board[(sq)]==OFFBOARD)
 
 const vector<int> loop_slide_piece{wb,wr,wq,0,bb,br,bq,0};
+const vector<int> loop_slide_index{0,4};
 
-// butb  but but pta kese chlega ki side to move is black or white 
-// to ek aur arrrya use krnge
-
-
- const vector<int> loop_slide_index{0,4};// white to 0 index se start nhi to 4 index se start
-
-// jese mana 
-//loop_slide_index[black]=4;
-//then 
-//loop_slide_piece[loop_slide_index[side]]==bb  side black thi
-//  yha s estart hoga ye array
-
-
-
-// for non slidng pieces we also do the same
 const vector<int> loop_non_slide_piece{wn,wk,0,bn,bk,0};
 const vector<int> loop_non_slide_index{0,3};
 
-
- // ab move generation  for non sliders
-// to jese knight h to 8 diff directionm me ja skta h vo to
-// to tele program that we need to loop through 8 different direction
-// piece dir array bnaenge
-
-// aur ye bhi btaenge ek arra se ki hr piece ke pas kitni direction me move h
 const vector<vector<int> > piece_dir{
 	{ 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 0, 0, 0 },
@@ -107,65 +30,37 @@ const vector<vector<int> > piece_dir{
 };
 
 const vector<int>num_dir{0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8};
-// to matlb mana rook 4 dir h to 4 baar upr rook kk arr me loop krna h
-// pawns set nhi kiye h kuki unka case alag se handle kiya h movegen me
 
-/*
-    onr onr 
+// all diff func cause all will have different score at some point
+// hr move ka score hoga
+//usse decide hoga konsa best move h
 
-    movegen (board,movelist){
-        loop all piees
-         then for each pieces
-          slider move each direection  add move
-            to aadd move   ist->moves[list count]=move;list->count++;
-    }
-
-*/
-
-
-
-
-// ye function movegen.c me kai baar usse honge
-// aur khi nhi honge to
-// ise static bnao
-
-
-static void add_quite_move(const s_board * pos,int move,s_movelist * list){// in this list we will be adding move
-    list->moves[list->count].move=move;// sboard ke move me move dalaa kuki movelist me smove ka var h
-    //score bhi set kro
+static void add_quite_move(const s_board * pos,int move,s_movelist * list){
+    list->moves[list->count].move=move;
     list->moves[list->count].score=0;
-    list->count++;// increment the number of moves
+    list->count++;
 }
 
-static void add_capture_move(const s_board * pos,int move,s_movelist * list){// in this list we will be adding move
-    list->moves[list->count].move=move;// sboard ke move me move dalaa kuki movelist me smove ka var h
-    //score bhi set kro
+static void add_capture_move(const s_board * pos,int move,s_movelist * list){
+    list->moves[list->count].move=move;
     list->moves[list->count].score=0;
-    list->count++;// increment the number of moves
+    list->count++;
 }
 
-
-static void add_enpass_move(const s_board * pos,int move,s_movelist * list){// in this list we will be adding move
-    list->moves[list->count].move=move;// sboard ke move me move dalaa kuki movelist me smove ka var h
-    //score bhi set kro
+static void add_enpass_move(const s_board * pos,int move,s_movelist * list){
+    list->moves[list->count].move=move;
     list->moves[list->count].score=0;
-    list->count++;// increment the number of moves
+    list->count++;
 }
-
 
 static void add_white_pawn_cap_move(const s_board * pos , const int from, const int to,
                 const int cap, s_movelist * list){
 
-
-    // assert to check that argument of cap piece is valid or empty
     ASSERT(piece_valid_empty(cap));
     ASSERT(sq_on_board(from));
     ASSERT(sq_on_board(to));
 
-
-    if(rank_board[from]==r7){// 7 se 8 rank pr ja rha hhmne mana h to vha jake
-    // ek ko promote krega
-    // we will byild move using captured piece   and promoted wq, wn  etc kra h
+    if(rank_board[from]==r7){
         add_capture_move(pos,move(from,to,cap,wq,0),list);
         add_capture_move(pos,move(from,to,cap,wr,0),list);
         add_capture_move(pos,move(from,to,cap,wb,0),list);
@@ -173,49 +68,31 @@ static void add_white_pawn_cap_move(const s_board * pos , const int from, const 
     }    
     else   
         add_capture_move(pos,move(from,to,cap,emptyy,0),list);          
-
 }
 
-
 static void add_white_pawn_move(const s_board * pos , const int from, const int to,s_movelist * list){
-
-    // assert to check that piece is valid or empty
+    
     ASSERT(sq_on_board(from));
     ASSERT(sq_on_board(to));
 
-
-    if(rank_board[from]==r7){// 7 se 8 rank pr ja rha hhmne mana h to vha jake
-    // ek ko promote krega
-    // we will byild move using captured piece   and promoted wq, wn  etc kra h
-        add_capture_move(pos,move(from,to,emptyy,wq,0),list);// cpatured piece nhi h isliye empty
+    if(rank_board[from]==r7){
+        add_capture_move(pos,move(from,to,emptyy,wq,0),list);
         add_capture_move(pos,move(from,to,emptyy,wr,0),list);
         add_capture_move(pos,move(from,to,emptyy,wb,0),list);
         add_capture_move(pos,move(from,to,emptyy,wn,0),list);
     }    
     else   
         add_capture_move(pos,move(from,to,emptyy,emptyy,0),list);          
-
 }
-
-
-// do tthis for black also
-
 
 static void add_black_pawn_cap_move(const s_board * pos , const int from, const int to,
                 const int cap, s_movelist * list){
 
-    
-    // assert to check that argument of cap piece is valid or empty
     ASSERT(piece_valid_empty(cap));
     ASSERT(sq_on_board(from));
     ASSERT(sq_on_board(to));
 
-
-    if(rank_board[from]==r2){// ab yha r7 ki jgh r2 kra h
-    // kuki black promote hi tb hpoga jb 2 se 1st rank pr jaega
-    // white vale ka ulta kumki opposite side h
-    // ek ko promote krega
-    // we will byild move using captured piece  
+    if(rank_board[from]==r2){
         add_capture_move(pos,move(from,to,cap,bq,0),list);
         add_capture_move(pos,move(from,to,cap,br,0),list);
         add_capture_move(pos,move(from,to,cap,bb,0),list);
@@ -223,22 +100,16 @@ static void add_black_pawn_cap_move(const s_board * pos , const int from, const 
     }    
     else   
         add_capture_move(pos,move(from,to,cap,emptyy,0),list);          
-
 }
 
 static void add_black_pawn_move(const s_board * pos , const int from, const int to,s_movelist * list){
 
-
-    // assert to check that argument of cap piece is valid or empty
-
     ASSERT(sq_on_board(from));
     ASSERT(sq_on_board(to));
 
-
     if(rank_board[from]==r2){
-    // ek ko promote krega
-    // we will byild move using captured piece  
-        add_capture_move(pos,move(from,to,emptyy,bq,0),list);// cpatured piece nhi h isliye empty
+    
+        add_capture_move(pos,move(from,to,emptyy,bq,0),list);
         add_capture_move(pos,move(from,to,emptyy,br,0),list);
         add_capture_move(pos,move(from,to,emptyy,bb,0),list);
         add_capture_move(pos,move(from,to,emptyy,bn,0),list);
@@ -248,19 +119,9 @@ static void add_black_pawn_move(const s_board * pos , const int from, const int 
 
 }
 
-
-
-
-// now after all this we can generate our movegen fun
-
-// isme jo print stetment h vo checking ke liye h
-// last me kuchko replace krenge  by functions 
-// like add quite move, ca add captured move  etc etc
-//to store a move in  a movelist
-
 void generate_all_moves(const s_board * pos,s_movelist * list){
     ASSERT(check_board(pos));
-    list->count=0;// cz no move  generated
+    list->count=0;
 
     int piece=emptyy;
     int side=pos->side;

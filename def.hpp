@@ -30,7 +30,7 @@ typedef unsigned long long u64;
 #define board_sq_num 120
 #define maxmoves 2048// half moves
 
-#define max_position_on_moves 256
+#define max_position_on_moves 256// 1 given pos pr max move itne ho skte h
 
 #define start_fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -53,40 +53,18 @@ enum board120{
 enum castle{wkca=1,wqca=2,bkca=4,bqca=8};
 
 class s_undo{
-    // int moves,castle_perm,enpass,fiftymove;
-    // u64 poskey;// pos key of the move that was played
-
     public:
 
     int moves,castle_perm,enpass,fiftymove;
-    u64 poskey;// pos key of the move that was played
-
-    // int get_moves(){return moves;}
-    // int get_castle_perm(){return castle_perm;}
-    // int get_enpass(){return enpass;}
-    // int get_fiftymove(){return fiftymove;}
-    // u64 get_poskey(){return poskey;}
-
-    // void set_moves(int mv){moves=mv;}
-    // void set_castle_perm(int cp){castle_perm=cp;}
-    // void set_enpass(int en){ enpass=en;}
-    // void set_fiftymove(int fm){fiftymove=fm;}
-    // void set_poskey(int ps){poskey=ps;}
-
+    u64 poskey;
 };
 
 class s_board {
-    
-    // int side,enpass,fiftymove,ply,hisply,castle_perm;
-    // u64 poskey;
-    
     public:
 
-     
     int side,enpass,fiftymove,ply,hisply,castle_perm;
     u64 poskey;
     
-
     vector<int>pieces=vector<int>(board_sq_num);
     vector<u64>pawns=vector<u64>(3);
     vector<int>king_sq=vector<int>(2);
@@ -101,69 +79,37 @@ class s_board {
     vector<s_undo>history=vector<s_undo>(maxmoves);
    
     vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
-    // to search which color piece is on board or not faster method no need to loop complete 120 board
-
-
-    // int get_side()const {return side;}
-    // int get_sidee() {return side;}
-    // int get_enpass()const {return enpass;}
-    // int get_fiftymove()const {return fiftymove;}
-    // int get_ply()const {return ply;}
-    // int get_hisply()const {return hisply;}
-    // int get_castle_perm()const {return castle_perm;}
-    // u64 get_poskey()const {return poskey;}
-
-    // void set_side(int sd){side=sd;}
-    // void set_enpass(int en){enpass=en;}
-    // void set_fiftymove(int fm){fiftymove=fm;}
-    // void set_ply(int pl){ply=pl;}
-    // void set_hisply(int hp){hisply=hp;}
-    // void set_castle_perm(int cp){castle_perm=cp;}
-    // void set_poskey(int ps){poskey=ps;}
-
 };
 
 class s_move{
-    // int move;
-    // int score;
-
     public:
 
     int move;
     int score;
-
-    // int get_move(){return move;}
-    // int get_score(){return score;}
-
-    // void set_move(int mv){move=mv;}
-    // void set_score(int sc){score=sc;}
-
 };
 
-class s_move_list{
-    //int count;
-
+class s_movelist{
     public:
     
-    int count;
-
+    int count;//count of the number of move on the movelist
     vector<s_move>moves=vector<s_move>(max_position_on_moves);
-    // int get_count(){return count;}
-    // void set_count(int ct){count=ct;}
 };
 
 #define from_sq(m)    ((m) & 0x7F )
 #define to_sq(m)    (((m)>>7) & 0x7F )
 
-#define captured(m)    (((m)>>14) & 0xF )
+#define captured(m)    (((m)>>14) & 0xF )// to check what piece get captured in our move
+//simply put it in captured which will >> by 14 and & with 0xF  to tell what is get captured in the move
 #define promoted(m)    (((m)>>20) & 0xF )
 
 #define move_flag_ep 0x40000
 #define move_flag_ps 0x80000
 #define move_flag_cs 0x1000000
 
-#define move_flag_cap 0x7C000
-#define move_flag_prom 0xF00000
+#define move_flag_cap 0x7C000  // to check is something get captured in our move
+//ep + cap ka   ep 100  vala us 7 * 0000 val ebox ka 
+//cap 0011 1100  to total 111 1100   which is 7 and 12  7 C  bahce sare 3  0000  to 000
+#define move_flag_prom 0xF00000// to check wheather anything was promoted during move
 
 #define fr_to_sq(f,r) ((21+(f)) + ((r)*10))
 
@@ -238,10 +184,10 @@ extern int square_attacked(const int sq,const int side, const s_board *pos);
 //io.cpp
 extern char * print_move(const int move);
 extern char * print_sq(const int sq);
-//extern void print_move_list(const s_movelist* list);
+extern void print_move_list(const s_movelist* list);
 
 // movegen.cpp
-//extern void generate_all_moves(const s_board * pos,s_movelist * list);
+extern void generate_all_moves(const s_board * pos,s_movelist * list);
 
 //validate.cpp
 extern int sq_on_board(const int sq);

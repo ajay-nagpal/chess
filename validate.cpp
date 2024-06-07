@@ -19,6 +19,3 @@ int piece_valid_empty(const int piece){
 int piece_valid(const int piece){
     return (piece>=wp && piece<=bk)?1:0;
 }
-
-// assert me use krnge in ufun oko assert(sq_on_board(jis sq kko hme dekhna h ki vo board pr h ya n hi let sq))
-// ye 1,0 return kregea assert ko aur assert us hisab se fail hoga

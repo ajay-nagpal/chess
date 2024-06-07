@@ -33,157 +33,43 @@ using namespace std;
 
 #define perftfen "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
+void printbin(int move){
+    int index=0;
+    cout<<endl<<"as binary"<<endl;
 
+    for(index=27;index>=0;index--){
+        if((1<<index) & move)
+            cout<<"1";
+        else
+            cout<<"0";
 
-
-// void show_sq_attack_by_side(const int side,const s_board *pos){
-
-//     int rank=0,sq=0,file=0;
-//     cout<<"square attacked by "<<side_char[side]<<" side"<<endl;
-
-//     for(rank=r8;rank>=r1;rank--){
-//         for(file=fa;file<=fh;file++){
-
-//             sq=fr_to_sq(file,rank);
-
-//             if(square_attacked(sq,side,pos)==true)// put x if sq is attacked by that side
-//                 cout<<"X";
-//             else 
-//                 cout<<"-";   
-//         }
-//         cout<<endl;
-//     }
-//     cout<<endl;
-// }
-
-
-
-
-// void printbin(int move){
-//     int index=0;
-//     cout<<endl<<"as binary"<<endl;
-
-//     for(index=27;index>=0;index--){
-//         if((1<<index) & move)
-//             cout<<"1";
-//         else
-//             cout<<"0";
-
-//         if(index!=28 & index%4==0) 
-//             cout<<" ";
-//     }
-//     cout<<endl;
-// }
+        if(index%4==0) 
+            cout<<" ";
+    }
+    cout<<endl;
+}
 
 
 int main(){
     AllInit();
     //return 0;
-
-
-
-    // checking sqattack  function
-
-    // to check  this create a functio n show square attacked by side in vice.c
-    // then delete it after use
-
-
-    // to check this side function 
-    // change fen1   only take queen  of black and white 
-    // bcz we know the direction of queen attacking
-    // commented old one and check by new one
-
-    // s_board board[1];
-    // parse_fen(fen1,board);
-    // // assert nhi diya kuki hm usme king square check krte h
-    // // aur fen1 me hmne king nhi diya
-
-    // print_board(board);
-
-    // cout<<endl<<" white attacking "<<endl;
-    // show_sq_attack_by_side(white,board);
-
-    // cout<<endl<<" black attacking "<<endl;
-    // show_sq_attack_by_side(black,board);
     
-    // return 0;
-
-
-    /*
-    // for move
-
-    //checckboard function
-    s_board board[1];
-
-    parse_fen(fen4,board);
-    cout<<endl<<" board: "<<endl;
-    print_board(board);
-
-    ASSERT(check_board(board));
-
-    // no assert fails here and print everything correctly
-
-
-    int move=0;
-    // now create move
-    // 1 hi int me sab ki bits jaenge to hme ese hi set krna h
-    // from aur to set kiya jese or krek  
-    int from=6,to=12,captured=wr,promoted=br;  
-    move=((from)|(to<<7)|(captured<<14)|(promoted<<20));// se that def.h comments about move 0000 0000 ... vala
-
-
-    // print move in decimal and hexadec
-
-    printf("\n decimal: %d  hexa:%X\n",move,move);
-    
-    printbin(move);
-    // print binary by printbin fun  then after htis not use of it
-    //decimal: 10552838  hexa:A10606
-
-    //as binary:
-    //0000 1010 0001 0000 0110 0000 0110 
-    //      br   wr
-
-    // now use the macro to retreive the information
-
-    cout<<endl<<"from :<< from_sq(move)  <<" to: " to_sq(move)<<
-      " cap: " <<captured(move)<<" prom: "<<promoted(move)<<endl;
-           
-
-    
-
-    // if move is a pawn start or not
-
-    move|=move_flag_ps;// is ps yes aaye uske liya  if ye nhi to is ps no  aaaega
-
-    cout<<endl<"is PS:"<<(move & move_flag_ps)?"yes":"no"<<endl;
-    */
-
-
-   /*
-
-   // io.c checking //  move related starting 2 fun
-
    int move=0;
-   int from=a2,to=h7,cap=wr,prom=bk;// yha check ke liye wr,wq,bn,br laga skte h 
-    //algebric me last me add ho jaega  hoga to   and let king ko bhi promote krke dekho kya aata h
-    // default queen aaaega
+   int from=a2,to=h7,cap=wr,prom=bk;
 
    move=((from)|(to<<7)|(cap<<14)|(prom<<20));
 
-   //printf("\n from:%d to:%d cap:%d prom:%d\n", 
-            from_sq(move),to_sq(move),captured(move),promoted(move));
-    cout<<endl<<"from :<< from_sq(move)  <<" to: " to_sq(move)<<
+    cout<<endl<<"from :"<< from_sq(move)  <<" to: "<< to_sq(move)<<
       " cap: " <<captured(move)<<" prom: "<<promoted(move)<<endl;
 
-    //printf("algebric from:%s\n",print_sq(from));
-    //printf("algebric to:%s\n",print_sq(to));
+    // printf("algebric from:%s\n",print_sq(from));
+    // printf("algebric to:%s\n",print_sq(to));
 
     cout<<"algebric from : "<<print_sq(from)<<endl;
-    cout<<"algebric tp : "<<print_sq(to)<<endl;
+    cout<<"algebric to : "<<print_sq(to)<<endl;
+
     printf("algebric move:%s\n",print_move(move));
 
-    */
 
 
 
