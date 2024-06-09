@@ -128,18 +128,16 @@ void reset_board(s_board *pos){
     for(index=0;index<64;index++)
         pos->pieces[SQ120(index)]=emptyy;
 
-    for(index=0;index<3;index++){
+    for(index=0;index<2;index++){
         pos->big_pieces[index]=0;
         pos->major_pieces[index]=0;
         pos->minor_pieces[index]=0;
-
         pos->material[index]=0;
         
     }
 
     for(index=0;index<3;index++)
         pos->pawns[index]=0ULL;
-
 
     for(index=0;index<13;index++)
         pos->piece_num[index]=0;

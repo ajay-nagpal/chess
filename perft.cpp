@@ -1,20 +1,3 @@
-// perft testing for testing makemove file
-
-    /*
-    //depth 3 h
-                    pos
-            
-            move                    move(pos for next call)
-
-    move            move            move            move
-
-move    move    move    move  move      move    move       move
-    
-    leaf node count krte h kuki ek fix nmumber of lef nod h kuch khas chess board pr bni pos ka to vo check krte h
-    usse makemove.c test hota h
-    */
-
-   
 #include"def.hpp"
 #include<iostream>
 
@@ -24,18 +7,18 @@ long leaf_nodes;
 
 void perft(int depth, s_board *pos){
     ASSERT(check_board(pos));
-    if(depth==0){
+    
+    if(depth==0){// recursion ki return condn
         leaf_nodes++;
         return ;
     }
 
-    s_movelist list[1];// otherwise make a move list and generate all the moves for this postiion
+    s_movelist list[1];
     generate_all_moves(pos,list);
 
     int move_num=0;
-
-    for(move_num=0;move_num<list->count;move_num++){// loop through all the move in  aposition
-        if(!make_move(pos,list->moves[move_num].move)){// ignoring the illegal moves
+    for(move_num=0;move_num<list->count;move_num++){
+        if(!make_move(pos,list->moves[move_num].move)){
             continue;
         }
 
@@ -45,11 +28,7 @@ void perft(int depth, s_board *pos){
     return;
 }
 
-// hr move ke liye indivisual leaf nodes  to h hi
-// recurse se bhi shi function bna skte h ek
-// basically mirror image of perft function
-
-void perft_test(int depth, s_board *pos){
+void perft_test(int depth, s_board *pos){// leaf nodes for each move
     ASSERT(check_board(pos));
     print_board(pos);
 
@@ -77,9 +56,9 @@ void perft_test(int depth, s_board *pos){
         long old_nodes=leaf_nodes-cum_nodes;// and used it to count
         // the number of leaf nodes searched on the previous move and print those to screen
 
-        cout<<"move: "<<move_num+1<<" "<<print_move(move)<<" "<<old_nodes<<endl;
+        cout<<endl<<"move: "<<move_num+1<<" : "<<print_move(move)<<" : "<<old_nodes<<endl;
     }
     // print complete test result to the screen
-    cout<<"test complete: "<<leaf_nodes<<" "<< "nodes visited"<<endl;
+    cout<<endl<<"test complete: "<<leaf_nodes<<" "<< " nodes visited"<<endl;
     return;
 }

@@ -26,7 +26,7 @@ vector<int>piece_value{0,100,325,325,550,1000,50000,100,325,325,550,1000,50000};
 vector<int>piece_color{both,white,white,white,white,white,white,black,black,black,black,black,black};
 
 
-vector<bool>piece_pawn{ false, true, false, false, false, false, false, true, false, false, false, false, false };
+vector<bool>piece_pawn        { false, true, false, false, false, false, false, true, false, false, false, false, false };
 	
 vector<bool>piece_knight      { false, false, true, false, false, false, false, false, true, false, false, false, false };
 vector<bool>piece_king        { false, false, false, false, false, false, true, false, false, false, false, false, true };

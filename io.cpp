@@ -21,9 +21,8 @@ char * print_move(const int move){
     int ft=file_board[to_sq(move)];
     int rt=rank_board[to_sq(move)];
 
-    cout<<endl<<"ff "<<ff<<endl<<" rf "<<rf<<endl<<" ft "<<ft<<endl<<" rt "<<rt<<endl;
+    //cout<<endl<<" ff "<<ff<<" rf "<<rf<<" ft "<<ft<<" rt "<<rt<<endl;
 
-    // what piece we promoted to if any
     int promoted=promoted(move);
 
     if(promoted){
@@ -54,7 +53,7 @@ void print_move_list(const s_movelist* list){
         move=list->moves[index].move;
         score=list->moves[index].score;
 
-        cout<<"move "<<index+1<< " "<< print_move(move)<<endl<<"score " <<score<<endl;
+        cout<<"move "<<index+1<<"  "<< print_move(move)<<"  score " <<score<<endl;
     }
 
     cout<<"movelist total " <<list->count<<" moves"<<endl;

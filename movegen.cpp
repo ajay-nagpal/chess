@@ -31,10 +31,6 @@ const vector<vector<int> > piece_dir{
 
 const vector<int>num_dir{0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8};
 
-// all diff func cause all will have different score at some point
-// hr move ka score hoga
-//usse decide hoga konsa best move h
-
 static void add_quite_move(const s_board * pos,int move,s_movelist * list){
     list->moves[list->count].move=move;
     list->moves[list->count].score=0;
@@ -129,38 +125,18 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
 
     int dir=0,index=0,piece_index=0;
 
-    //printf("\nside:%d\n",side);
-
-    if(side==white){ // if the side is white  to geneerate the white pawn move 
+    if(side==white){ 
         for(pce_num=0;pce_num<pos->piece_num[wp];pce_num++){// loop through all white pawns on the board
 
-            sq=pos->piece_list[wp][pce_num];// kis square pr h vo pawn ye dekho  piece list se which is index by piece type
-            // piece list tkake wp   and at which piece number we want ot look at
+            sq=pos->piece_list[wp][pce_num];
             ASSERT(sq_on_board(sq));
-            
-
-            // generate non captured moves  where pawn move simply forward and 
-            // aur forward move ke liye uske vo sq empty hona chhiye jha move krna h
-            // pawn phli baar me 1 ya  2 forwsrd move kr sta h   usk ebbad 1 forward
-            //+10 hi jate h forward jese 34 pr tha paawn mana to 44 pr jaegge 
-            if(pos->pieces[sq+10]==emptyy){// if empty
-                // then add a white pawn move
+        
+            if(pos->pieces[sq+10]==emptyy){
                 add_white_pawn_move(pos,sq,sq+10,list);
-
-                //ya 20 pr phli baar me bs 
-                // kuki 2 bsq aage move
-                if(rank_board[sq]==r2 && pos->pieces[sq+20]==emptyy){  // if empty
-                    // then add a quite move cz there ois no promotion adn we starting from second rank
-                    // empty h promotion
+                if(rank_board[sq]==r2 && pos->pieces[sq+20]==emptyy){ 
                     add_quite_move(pos,move(sq,sq+20,emptyy,emptyy,move_flag_ps),list);
                 }
             }
-
-            // nextr 2 if's for generatign the captures
-            // +9  ya +11 direction me hoga capture, pawn ko krna h agar koi to
-            // jahir si baat h +9 ya +11 vale lka color different hoga apne sq se
-            // +9 a +11 vala off board na ho + other condn
-            // tehn we can add a white pawn captured move
 
             if(!square_offboard(sq+9)  && piece_color[pos->pieces[sq+9]]==black){// white bllack ko acptured krega
                 add_white_pawn_cap_move(pos,sq,sq+9,pos->pieces[sq+9],list);
@@ -170,10 +146,6 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
                 add_white_pawn_cap_move(pos,sq,sq+11,pos->pieces[sq+11],list);
             }
 
-            // other 2 if's for generat ethe enpass captures
-
-            // imp
-            // yha add capture move hi lagega kuki 6th rank pr promotion lagaegga nhi
             if(pos->enpass!=no_sq){
                 if(sq+9==pos->enpass){
                     add_capture_move(pos,move(sq,sq+9,emptyy,emptyy,move_flag_ep),list);
@@ -187,67 +159,44 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
 
         // for castling king side and queen side
 
-        if(pos->castle_perm & wkca ){// means we got permission to castle king side
+        if(pos->castle_perm & wkca ){
             if(pos->pieces[f1]==emptyy && pos->pieces[g1]==emptyy){
                 if(!square_attacked(e1,black,pos) && !square_attacked(f1,black,pos)){
-                    //is e1 and f1 attacked by black
-                    //printf("\n wkca movegen\n");
-
                     add_quite_move(pos,move(e1,g1,emptyy,emptyy,move_flag_cs),list);
                 }
             }
         }
 
-        if(pos->castle_perm & wqca ){//queen side castlin gpermission
+        if(pos->castle_perm & wqca ){
             if(pos->pieces[d1]==emptyy && pos->pieces[c1]==emptyy && pos->pieces[b1]==emptyy){
                 if(!square_attacked(e1,black,pos) && !square_attacked(d1,black,pos)){
-                    //printf("\n wqca movegen\n");
-
                     add_quite_move(pos,move(e1,c1,emptyy,emptyy,move_flag_cs),list);
                 }
             }
         }
     }
     else{
-        for(pce_num=0;pce_num<pos->piece_num[bp];pce_num++){// loop through all black pawns on the board
+        for(pce_num=0;pce_num<pos->piece_num[bp];pce_num++){
 
-            sq=pos->piece_list[bp][pce_num];// kis square pr h vo pawn ye dekho  piece list se which is index by piece type
-            // piece list tkake bp   and at which piece number we want ot look at
+            sq=pos->piece_list[bp][pce_num];
             ASSERT(sq_on_board(sq));
-            
-            // yha -10 direction hoga obvious h kuki black go from top to bottom
-            if(pos->pieces[sq-10]==emptyy){// if empty
-                // then add a black pawn move
-                add_black_pawn_move(pos,sq,sq-10,list);
+    
+            if(pos->pieces[sq-10]==emptyy){
+                add_black_pawn_move(pos,sq,(sq-10),list);
 
-                //ya -20 pr phli baar me bs 
-                // kuki 2 bsq aage move
-                if(rank_board[sq]==r7 && pos->pieces[sq-20]==emptyy){  // if empty
-                    // then add a quite move cz there ois no promotion adn we starting from second rank
-                    // empty h promotion
-                    add_quite_move(pos,move(sq,sq-20,emptyy,emptyy,move_flag_ps),list);
+                if(rank_board[sq]==r7 && pos->pieces[sq-20]==emptyy){  
+                    add_quite_move(pos,move(sq,(sq-20),emptyy,emptyy,move_flag_ps),list);
                 }
             }
 
-            // nextr 2 if's for generatign the captures
-            // -9  ya -11 direction me hoga capture, pawn ko krna h agar koi to
-            // jahir si baat h -9 ya -11 vale lka color different hoga apne sq se
-            // -9 a -11 vala off board na ho + other condn
-            // tehn we can add a black pawn captured move
-
-            if(!square_offboard(sq-9)  && piece_color[pos->pieces[sq-9]]==white){// yha white kuki 
-                // black, white ko captured krega
-                add_black_pawn_cap_move(pos,sq,sq+9,pos->pieces[sq-9],list);
+            if(!square_offboard(sq-9)  && piece_color[pos->pieces[sq-9]]==white){
+                add_black_pawn_cap_move(pos,sq,sq-9,pos->pieces[sq-9],list);
             }
 
             if(!square_offboard(sq-11)  && piece_color[pos->pieces[sq-11]]==white){
                 add_black_pawn_cap_move(pos,sq,sq-11,pos->pieces[sq-11],list);
             }
 
-            // other 2 if's for generat ethe enpass captures
-
-            // imp
-            // yha add capture move hi lagega kuki 6th rank pr promotion lagaegga nhi
             if(pos->enpass!=no_sq){
                 if(sq-9==pos->enpass){
                     add_capture_move(pos,move(sq,sq-9,emptyy,emptyy,move_flag_ep),list);
@@ -259,147 +208,81 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
             }
         }
 
-        // for castling king side and queen side
-
-        if(pos->castle_perm & bkca ){// means we got permission to castle king side
+        if(pos->castle_perm & bkca ){
             if(pos->pieces[f8]==emptyy && pos->pieces[g8]==emptyy){
                 if(!square_attacked(e8,white,pos) && !square_attacked(f8,white,pos)){
-                    //printf("\n bkca movegen\n");
-
-                    //e8 to g8
                     add_quite_move(pos,move(e8,g8,emptyy,emptyy,move_flag_cs),list);
                 }
             }
         }
 
-        if(pos->castle_perm & bqca ){//queen side castlin gpermission
+        if(pos->castle_perm & bqca ){
             if(pos->pieces[d8]==emptyy && pos->pieces[c8]==emptyy && pos->pieces[b8]==emptyy){
                 if(!square_attacked(e8,white,pos) && !square_attacked(d8,white,pos)){
-                   //printf("\n bqca movegen\n");
-
                    add_quite_move(pos,move(e8,c8,emptyy,emptyy,move_flag_cs),list);
                 }
             }
         }
-
     }
 
-    // loop for sliders// sliding pieces
-    // top pr jo aarrray bnae uskae logic se
-
-    piece_index=loop_slide_index[side];// black to 4 dega nhi to 0
-    piece=loop_slide_piece[piece_index++];// us index se piece liayat hen increment the index
+    //sliders
+    piece_index=loop_slide_index[side];
+    piece=loop_slide_piece[piece_index++];
 
     while(piece!=0){
         ASSERT(piece_valid(piece));
 
-        //printf("\n sliders : piece_index: %d piece:%d\n",piece_index,piece);
-
-        // non sliders ka dekho phle loop andar ka
-        // sliders ka same hi h 
-
-        // once we got the piece type we do exactly same loop as we did in pawn moves
-        // loop through all the pieces in pieces list
-
         for(pce_num=0;pce_num<pos->piece_num[piece];pce_num++){
             sq=pos->piece_list[piece][pce_num];
             ASSERT(sq_on_board(sq));
-            //printf("\n piece: %c on %s \n",piece_char[piece],print_sq(sq));
+            
+            for(index=0;index<num_dir[piece];index++){
+                dir=piece_dir[piece][index];
+                target_sq=sq+dir;
 
+                while(!square_offboard(target_sq)){
 
-
-            // ab move generation  for  sliders
-            // non sliders jesa h same
-
-            for(index=0;index<num_dir[piece];index++){// num dire ne total direction di utna loop chlega
-                dir=piece_dir[piece][index];// then we simply taking ech of the direction at index 0 to index
-                target_sq=sq+dir;// sq the piece is on +direction
-
-                // yha we iterate futther in direction 
-                while(!square_offboard(target_sq)){// lop isliye
-                // kuki jese pura diagonal chl skta h ek piece to tb tk chlte jao jb tk offboard na a jaye
-                    // dealing with capture
-                    //black white 0 and 1 h 
-                    // black ^1==white     white ^1== black  
-
-                    if(pos->pieces[target_sq]!=emptyy){// then it can be a capture
-                        if(piece_color[pos->pieces[target_sq]]==(side^1)){// color opposite ho
-                            //printf("\t\t captured on %s\n",print_sq(target_sq));// cap sq
-
-                            // captured piece would be the piece at out target square in our position
+                    if(pos->pieces[target_sq]!=emptyy){
+                        if(piece_color[pos->pieces[target_sq]]==(side^1)){
                             add_capture_move(pos,move(sq,target_sq,pos->pieces[target_sq],emptyy,0),list);
                         }
-                        break;// kuki capture ho gya to ab continue thodi hoga 
-                        // loop break krenge kuki jese kisi ko pura diagonal jana h
-                        // pr usne capture kr liya to break ab
+                        break;
                     }
-                    // otherwise
-                    //printf("\t\t normal on %s\n",print_sq(target_sq));
                     add_quite_move(pos,move(sq,target_sq,emptyy,emptyy,0),list);
-
                     target_sq+=dir;
                 }
             }
         }
-        
         piece=loop_slide_piece[piece_index++];
     }
 
-    // for non sliders
-
     piece_index=loop_non_slide_index[side];// black to 4 dega nhi to 0
-    piece=loop_non_slide_piece[piece_index++];// us index se piece liayat hen increment the index
+    piece=loop_non_slide_piece[piece_index++];
 
     while(piece!=0){
         ASSERT(piece_valid(piece));
 
-        //printf("\n non sliders : piece_index: %d piece:%d\n",piece_index,piece);
-
-        // once we got the piece type we do exactly same loop as we did in pawn moves
-        // loop through all the pieces in pieces list
-
         for(pce_num=0;pce_num<pos->piece_num[piece];pce_num++){
+            
             sq=pos->piece_list[piece][pce_num];
             ASSERT(sq_on_board(sq));
-            //printf("\n piece: %c on %s \n",piece_char[piece],print_sq(sq));
-
-            // ab move generation  for non sliders
-            // to jese knight h to 8 diff directionm me ja skta h vo to
-            // to tele program that we need to loop through 8 different direction
-            // piece dir array bnaenge
-
-            // aur ye bhi btaenge ek arra se ki hr piece ke pas kitni direction me move h
-            // upr define kre h 2 arr
-            // to matlb mana rook 4 dir h to 4 baar upr rook kk arr me loop krna h
-            // pawns set nhi kiye h kuki unka case alag se handle kiya h movegen me
-
-            for(index=0;index<num_dir[piece];index++){// num dire ne total direction di utna loop chlega
-                dir=piece_dir[piece][index];// then we simply taking ech of the direction at index 0 to index
-                target_sq=sq+dir;// sq the piece is on +direction
+           
+            for(index=0;index<num_dir[piece];index++){
+                dir=piece_dir[piece][index];
+                target_sq=sq+dir;
 
                 if(square_offboard(target_sq))
                     continue;
 
-                // dealing with capture
-                //black white 0 and 1 h 
-                // black ^1==white     white ^1== black  
-
-                if(pos->pieces[target_sq]!=emptyy){// then it can be a capture
-                    if(piece_color[pos->pieces[target_sq]]==(side^1)){// color opposite ho
-                        //printf("\t\t captured on %s\n",print_sq(target_sq));// cap sq
-
-                        // captured piece would be the piece at out target square in our position
+                if(pos->pieces[target_sq]!=emptyy){
+                    if(piece_color[pos->pieces[target_sq]]==(side^1)){
                         add_capture_move(pos,move(sq,target_sq,pos->pieces[target_sq],emptyy,0),list);
                     }
                     continue;
                 }
-                // otherwise
-                //printf("\t\t normal on %s\n",print_sq(target_sq));
-
                 add_quite_move(pos,move(sq,target_sq,emptyy,emptyy,0),list);
             }
         }
         piece=loop_non_slide_piece[piece_index++];
     }
 }
-
