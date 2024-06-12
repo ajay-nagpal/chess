@@ -25,7 +25,7 @@ if(!(n)){\
 
 typedef unsigned long long u64;
 
-#define name "vice 1.0"
+#define NAME "vice 1.0" // __Apple__ me koi name already h// for time in ms ke liye use
 
 #define board_sq_num 120
 #define maxmoves 2048// half moves
@@ -111,6 +111,8 @@ class s_movelist{
 //cap 0011 1100  to total 111 1100   which is 7 and 12  7 C  bahce sare 3  0000  to 000
 #define move_flag_prom 0xF00000// to check wheather anything was promoted during move
 
+#define nomove 0
+
 #define fr_to_sq(f,r) ((21+(f)) + ((r)*10))
 
 #define SQ64(sq120) (sq120to64[(sq120)])
@@ -185,6 +187,7 @@ extern int square_attacked(const int sq,const int side, const s_board *pos);
 extern char * print_move(const int move);
 extern char * print_sq(const int sq);
 extern void print_move_list(const s_movelist* list);
+extern int parse_move(string ptr_char,s_board* pos);
 
 // movegen.cpp
 extern void generate_all_moves(const s_board * pos,s_movelist * list);
@@ -202,5 +205,12 @@ extern void take_move(s_board *pos);
 
 //perft.cpp
 extern void perft_test(int depth, s_board *pos);
+
+//search.cpp
+extern void search_pos(s_board * pos);
+extern int is_repetition(const s_board * pos);
+
+//misc.cpp
+extern int get_time_ms();
 
 #endif

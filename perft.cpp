@@ -35,6 +35,7 @@ void perft_test(int depth, s_board *pos){// leaf nodes for each move
     cout<<endl<<"starting test to depth: "<<depth<<endl;
 
     leaf_nodes=0;
+    int start=get_time_ms();//misc.cpp m h
 
     s_movelist list[1]; 
     generate_all_moves(pos,list);
@@ -59,6 +60,6 @@ void perft_test(int depth, s_board *pos){// leaf nodes for each move
         cout<<endl<<"move: "<<move_num+1<<" : "<<print_move(move)<<" : "<<old_nodes<<endl;
     }
     // print complete test result to the screen
-    cout<<endl<<"test complete: "<<leaf_nodes<<" "<< " nodes visited"<<endl;
+    cout<<endl<<"test complete: "<<leaf_nodes<<" "<< " nodes visited in "<<get_time_ms()-start<<" ms"<<endl;
     return;
 }
