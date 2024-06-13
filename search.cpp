@@ -11,7 +11,7 @@ int is_repetition(const s_board * pos){
     
     //history ki las entry se 1 km
     for(index=pos->hisply-pos->fiftymove;index<pos->hisply-1;index++){
-        ASSERT(index>=0 && index<maxmovesq);
+        ASSERT(index>=0 && index<maxmoves);
         if(pos->poskey==pos->history[index].poskey){
             return true;
         }

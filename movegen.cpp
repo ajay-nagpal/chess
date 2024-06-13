@@ -115,6 +115,23 @@ static void add_black_pawn_move(const s_board * pos , const int from, const int 
 
 }
 
+int move_exist(s_board * pos,const int move){
+    s_movelist list[1];
+    generate_all_moves(pos,list);
+
+    for(int move_num=0;move_num<list->count;move_num++){
+
+        if(!make_move(pos,list->moves[move_num].move)){// move not legle continue
+            continue;
+        }
+        take_move(pos);// if legle take it back and see if
+        if(list->moves[move_num].move==move){// that move equals to the move that we sent in
+            return true;
+        }
+    }
+    return false;
+}
+
 void generate_all_moves(const s_board * pos,s_movelist * list){
     ASSERT(check_board(pos));
     list->count=0;

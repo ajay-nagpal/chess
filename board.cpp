@@ -154,6 +154,10 @@ void reset_board(s_board *pos){
     pos->castle_perm=0;
 
     pos->poskey=0ULL;
+    
+    //call init pvtbale
+
+    init_pvtable(pos->pvtable);
 }
 
 void print_board(const s_board *pos){
