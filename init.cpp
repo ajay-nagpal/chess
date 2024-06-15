@@ -115,5 +115,7 @@ void AllInit(){
     inithashkey();
 
     init_file_rank_board();
+
+    init_mvvlva();
 }
     

@@ -7,16 +7,19 @@
 using namespace std;
 
 #define perftfen "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1"
-
-
+//#define wac1 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
+#define wac1 "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
+// this pos is mate in 3 so we will check this by our code
+// hmara mate 29000 h  isse last ka score depth 4 ka 28997 aaega
+// jo mate in 3 h 
 int main(){
     AllInit();
     
     s_board board[1];
     //vector<s_board>board(1);
     s_movelist list[1];
-
-    parse_fen(start_fen,board);
+    s_search_info info[1];
+    parse_fen(wac1,board);
 
     //char input[6];//5 for move 1 for enter
     string input;
@@ -35,19 +38,10 @@ int main(){
         else if(input[0]=='t'){
             take_move(board);
         }
-        else if(input[0]=='p'){
-            //perft_test(4,board);// to print time elapsed
+        else if(input[0]=='s'){
+           info->depth=4;
+           search_pos(board,info);
 
-            max=get_pvline(4,board);// set max to the count when we get the v line 
-            // count return hota h pv line se
-            // 4 move make krne board pr hmne fix kr diya depth ko yha
-            cout<<endl<<"pvline of "<<max<<" moves"<<endl;
-
-            for(int pvnum=0;pvnum<max;pvnum++){
-                move=board->pvarray[pvnum];// get the move form pv arrray and print it
-                cout<<print_move(move)<<" ";
-            }
-            cout<<endl;
         }
         else{
             // we have a move parse this move

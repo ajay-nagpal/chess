@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define DEBUG
+//#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -31,6 +31,8 @@ typedef unsigned long long u64;
 #define maxmoves 2048// half moves
 
 #define maxdepth 64
+#define infinite 30000
+#define mate 29000
 
 #define max_position_on_moves 256// 1 given pos pr max move itne ho skte h
 
@@ -96,7 +98,7 @@ class s_search_info{
     // time westart searching,depth set means we only search to certain depth acc to protocol
     //
     int start_time=0,stop_time=0,depth=0,depth_set=0,time_set=0;
-    int moves_to_go=0,infinite=0;
+    int moves_to_go=0;
     
     long nodes;// count of the pos that engine visit in search tree
     int quit=0,stopped=0;
@@ -106,6 +108,10 @@ class s_search_info{
     //if stop is sent then will stop searching and  stop will set true and simplely recursively
     // back out of search wihtout updating any score or something   and let these value maintain its best from 
     // previous iteration
+
+    float fail_high=0,fail_high_first=0;// will use for move ordereing short  form fh and fhf 
+    //One is the nember of times we get > beta on the first move, the other is the total > beta counts.
+    // It gives you an idea of how good your move ordering is. You want to be > 90%
 };
 
 class s_board {
@@ -246,6 +252,7 @@ extern int parse_move(string ptr_char,s_board* pos);
 // movegen.cpp
 extern void generate_all_moves(const s_board * pos,s_movelist * list);
 extern int move_exist(s_board * pos,const int move);
+extern void init_mvvlva();
 
 //validate.cpp
 extern int sq_on_board(const int sq);
@@ -269,7 +276,7 @@ extern int get_time_ms();
 
 //pvtable.cpp
 extern void init_pvtable(s_pvtable * table);
-//extern void clear_pvtable(s_pvtable * table);
+extern void clear_pvtable(s_pvtable * table);
 extern int probe_pvtable(const s_board* pos);
 extern void store_pvmove(const s_board* pos, const int move);
 extern int get_pvline(const int depth,s_board* pos);

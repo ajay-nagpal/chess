@@ -31,6 +31,64 @@ const vector<vector<int> > piece_dir{
 
 const vector<int>num_dir{0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8};
 
+
+// move ordering order for our code
+// pv move
+// cap move (2 type) mvv(most valuable vicitim)lva(least valuaable attacker)  
+    //we will use SEE(static exchange evaluater) for this  which valuate if capture are losing on a square
+    // evaluating recapture on the square
+//killer moves// moves which have made beta cutoff
+// historyscore
+
+/*
+most valuable victims order (q,r,b,n,p) then order of capture of these in least valuable attacker
+
+p * q(pawn takes queen)
+n * q
+b * q
+r * q
+..
+
+p * r(pawn takes rook )  and so on 
+..
+  so build an array index by[victim][attacker]  and score do inhe 
+   ki highest score p * q ka ho  and so on  like lowest score q * p (queen takes pawn)
+
+if victim queen to score 500   if (pawn capture then 505, knight capture queen 504  so on )
+        rook 400  
+
+*/
+const vector<int> victim_score={ 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600 };
+static vector<vector<int>> mvvlva_score(13,vector<int>(13));
+
+void init_mvvlva(){
+    int attacker, victim;
+
+    // dono loop white ke h aur king bhi cover ho gya but kuki legal move apne code me esa nhi hota to 
+    // to no need of correcting
+    // legal move vale hi calc krke print krega
+    for(attacker=wp; attacker<=bk;attacker++){
+        for(victim=wp;victim<=bk;victim++){
+            mvvlva_score[victim][attacker]=victim_score[victim]+6-(victim_score[attacker]/100);
+            // let queen victim to 500 +6(for general)
+            // attacker pawn to 100  means 100/100==1
+            // overall 505 what we wanted
+        }
+    }
+    
+    cout<<"piece_char[attacker] * piece_char[victim] = mvvlva_score[victim][attacker]"<<endl;
+    
+    for(victim=wp;victim<=bk;victim++){
+        for(attacker=wp; attacker<=bk;attacker++){
+            cout<<piece_char[attacker]<<" * "<<piece_char[victim]<<" = "<<mvvlva_score[victim][attacker]<<endl;
+        }
+    }
+}
+// ab score add kr paenge balki ke jo fun bnae unka 
+// jese add enpass smove me score 105 cz pawn takes pawn 
+// 100 +6-100/100  105
+// capture move me victim attacker se score set
+
 static void add_quite_move(const s_board * pos,int move,s_movelist * list){
     list->moves[list->count].move=move;
     list->moves[list->count].score=0;
@@ -39,13 +97,16 @@ static void add_quite_move(const s_board * pos,int move,s_movelist * list){
 
 static void add_capture_move(const s_board * pos,int move,s_movelist * list){
     list->moves[list->count].move=move;
-    list->moves[list->count].score=0;
+    // score mvvlva se set
+    list->moves[list->count].score=mvvlva_score[captured(move)][pos->pieces[from_sq(move)]];
     list->count++;
 }
 
 static void add_enpass_move(const s_board * pos,int move,s_movelist * list){
     list->moves[list->count].move=move;
-    list->moves[list->count].score=0;
+    // jese add enpass smove me score 105 cz pawn takes pawn 
+    // 100 +6-100/100  105
+    list->moves[list->count].score=105;
     list->count++;
 }
 
