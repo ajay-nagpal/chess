@@ -262,8 +262,7 @@ extern void take_move(s_board *pos);
 extern void perft_test(int depth, s_board *pos);
 
 //search.cpp
-extern void search_pos(s_board * pos);
-extern int is_repetition(const s_board * pos);
+extern void search_pos(s_board * pos,s_search_info * info);
 
 //misc.cpp
 extern int get_time_ms();
@@ -274,5 +273,8 @@ extern void init_pvtable(s_pvtable * table);
 extern int probe_pvtable(const s_board* pos);
 extern void store_pvmove(const s_board* pos, const int move);
 extern int get_pvline(const int depth,s_board* pos);
+
+//evaluate.cpp
+extern int eval_pos(const s_board * pos);
 
 #endif
