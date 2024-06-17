@@ -152,7 +152,5 @@ int eval_pos(const s_board * pos){
     if(pos->side==white){
         return score;
     }
-    else{
-        return -score;
-    }
+    return -score;   
 }

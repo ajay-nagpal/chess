@@ -3,11 +3,13 @@
 #include<iostream>
 using namespace std;
 
+const int pvsize=0x100000 *2;//2 mb  hex 1 mb h
+
 int get_pvline(const int depth,s_board* pos){// depth we want ot print pv to
     ASSERT(depth<maxdepth);
 
     int move=probe_pvtable(pos);
-    int count=0;// count of movews we managed to put in array pvarray def.hpp me h board me
+    int count=0;// count of movews we managed to put in array pvarray 
 
     while(move!=nomove && count<depth){
         ASSERT(count<maxdepth);
@@ -29,8 +31,6 @@ int get_pvline(const int depth,s_board* pos){// depth we want ot print pv to
     return count;
 }
 
-const int pvsize=0x100000 *2;//2 mb  hex 1 mb h
-
 void clear_pvtable(s_pvtable * table){
     s_pventry * pventry;// pointer to entry
     // loop through every entry in the table
@@ -43,9 +43,9 @@ void clear_pvtable(s_pvtable * table){
 void init_pvtable(s_pvtable * table){
     table->num_entries=pvsize/sizeof(s_pventry);// eg 4 divide in 2 , one get 2/4
     table->num_entries -=2;// for indexing purpose
-
-    //delete(table->ptable);// table pointer jise point kr rha use free
-    //table->ptable = (s_pventry *) malloc(table->new_entries * sizeof(s_pventry))
+    //free(table->ptable);
+    delete(table->ptable);// table pointer jise point kr rha use free
+    //table->ptable = (s_pventry *) malloc(table->num_entries * sizeof(s_pventry));
     table->ptable=new s_pventry[table->num_entries];// cgp
 
     clear_pvtable(table);
@@ -68,7 +68,7 @@ void store_pvmove(const s_board* pos, const int move){
     pos->pvtable->ptable[index].poskey=pos->poskey;
 }
 
-// fun to read/prob move from table if there is any
+// fun to retreve/prob move from table if there is any
 int probe_pvtable(const s_board* pos){
     int index=pos->poskey % pos->pvtable->num_entries;
     ASSERT(index>=0 && index<=pos->pvtable->num_entries-1);

@@ -75,14 +75,6 @@ void init_mvvlva(){
             // overall 505 what we wanted
         }
     }
-    
-    cout<<"piece_char[attacker] * piece_char[victim] = mvvlva_score[victim][attacker]"<<endl;
-    
-    for(victim=wp;victim<=bk;victim++){
-        for(attacker=wp; attacker<=bk;attacker++){
-            cout<<piece_char[attacker]<<" * "<<piece_char[victim]<<" = "<<mvvlva_score[victim][attacker]<<endl;
-        }
-    }
 }
 // ab score add kr paenge balki ke jo fun bnae unka 
 // jese add enpass smove me score 105 cz pawn takes pawn 
@@ -90,23 +82,44 @@ void init_mvvlva(){
 // capture move me victim attacker se score set
 
 static void add_quite_move(const s_board * pos,int move,s_movelist * list){
+    ASSERT(sq_on_board(from_sq(move)));
+    ASSERT(sq_on_board(to_sq(move)));
+    
     list->moves[list->count].move=move;
-    list->moves[list->count].score=0;
+
+    // if killer at best slot ie 0 slot ie first slot==  move we are adding
+    if(pos->search_killer[0][pos->ply]==move){
+        list->moves[list->count].score=900000;
+    }
+    else if(pos->search_killer[1][pos->ply]==move){
+        list->moves[list->count].score=800000;
+    }
+    else{
+        list->moves[list->count].score=pos->search_history[pos->pieces[from_sq(move)]][to_sq(move)];
+    }
+
     list->count++;
 }
 
 static void add_capture_move(const s_board * pos,int move,s_movelist * list){
+    ASSERT(sq_on_board(from_sq(move)));
+    ASSERT(sq_on_board(to_sq(move)));
+    ASSERT(piece_valid(captured(move)));
+
     list->moves[list->count].move=move;
     // score mvvlva se set
-    list->moves[list->count].score=mvvlva_score[captured(move)][pos->pieces[from_sq(move)]];
+    list->moves[list->count].score=mvvlva_score[captured(move)][pos->pieces[from_sq(move)]]+1000000;
     list->count++;
 }
 
 static void add_enpass_move(const s_board * pos,int move,s_movelist * list){
+    ASSERT(sq_on_board(from_sq(move)));
+    ASSERT(sq_on_board(to_sq(move)));
+
     list->moves[list->count].move=move;
     // jese add enpass smove me score 105 cz pawn takes pawn 
     // 100 +6-100/100  105
-    list->moves[list->count].score=105;
+    list->moves[list->count].score=105+1000000;
     list->count++;
 }
 
@@ -226,11 +239,11 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
 
             if(pos->enpass!=no_sq){
                 if(sq+9==pos->enpass){
-                    add_capture_move(pos,move(sq,sq+9,emptyy,emptyy,move_flag_ep),list);
+                    add_enpass_move(pos,move(sq,sq+9,emptyy,emptyy,move_flag_ep),list);
                 }   
 
                 if(sq+11==pos->enpass){
-                    add_capture_move(pos,move(sq,sq+11,emptyy,emptyy,move_flag_ep),list);
+                    add_enpass_move(pos,move(sq,sq+11,emptyy,emptyy,move_flag_ep),list);
                 }
             }
         }
@@ -277,11 +290,11 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
 
             if(pos->enpass!=no_sq){
                 if(sq-9==pos->enpass){
-                    add_capture_move(pos,move(sq,sq-9,emptyy,emptyy,move_flag_ep),list);
+                    add_enpass_move(pos,move(sq,sq-9,emptyy,emptyy,move_flag_ep),list);
                 }   
 
                 if(sq-11==pos->enpass){
-                    add_capture_move(pos,move(sq,sq-11,emptyy,emptyy,move_flag_ep),list);
+                    add_enpass_move(pos,move(sq,sq-11,emptyy,emptyy,move_flag_ep),list);
                 }
             }
         }
@@ -359,6 +372,131 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
                     continue;
                 }
                 add_quite_move(pos,move(sq,target_sq,emptyy,emptyy,0),list);
+            }
+        }
+        piece=loop_non_slide_piece[piece_index++];
+    }
+}
+
+// fun for generate caps  , , generate all move ko hi copy paste rkrkr thpfda change krkre nama bdlna h
+// and remove all the code that generate all non capture
+// remove empty vala , castling coede  , add quite move line remove
+
+void generate_all_caps(const s_board * pos,s_movelist * list){
+    ASSERT(check_board(pos));
+    list->count=0;
+
+    int piece=emptyy;
+    int side=pos->side;
+    int sq=0,target_sq=0,pce_num=0;
+
+    int dir=0,index=0,piece_index=0;
+
+    if(side==white){ 
+        for(pce_num=0;pce_num<pos->piece_num[wp];pce_num++){// loop through all white pawns on the board
+
+            sq=pos->piece_list[wp][pce_num];
+            ASSERT(sq_on_board(sq));
+        
+            if(!square_offboard(sq+9)  && piece_color[pos->pieces[sq+9]]==black){// white bllack ko acptured krega
+                add_white_pawn_cap_move(pos,sq,sq+9,pos->pieces[sq+9],list);
+            }
+
+            if(!square_offboard(sq+11)  && piece_color[pos->pieces[sq+11]]==black){
+                add_white_pawn_cap_move(pos,sq,sq+11,pos->pieces[sq+11],list);
+            }
+
+            if(pos->enpass!=no_sq){
+                if(sq+9==pos->enpass){
+                    add_enpass_move(pos,move(sq,sq+9,emptyy,emptyy,move_flag_ep),list);
+                }   
+
+                if(sq+11==pos->enpass){
+                    add_enpass_move(pos,move(sq,sq+11,emptyy,emptyy,move_flag_ep),list);
+                }
+            }
+        }
+    }
+    else{
+        for(pce_num=0;pce_num<pos->piece_num[bp];pce_num++){
+
+            sq=pos->piece_list[bp][pce_num];
+            ASSERT(sq_on_board(sq));
+    
+            if(!square_offboard(sq-9)  && piece_color[pos->pieces[sq-9]]==white){
+                add_black_pawn_cap_move(pos,sq,sq-9,pos->pieces[sq-9],list);
+            }
+
+            if(!square_offboard(sq-11)  && piece_color[pos->pieces[sq-11]]==white){
+                add_black_pawn_cap_move(pos,sq,sq-11,pos->pieces[sq-11],list);
+            }
+
+            if(pos->enpass!=no_sq){
+                if(sq-9==pos->enpass){
+                    add_enpass_move(pos,move(sq,sq-9,emptyy,emptyy,move_flag_ep),list);
+                }   
+
+                if(sq-11==pos->enpass){
+                    add_enpass_move(pos,move(sq,sq-11,emptyy,emptyy,move_flag_ep),list);
+                }
+            }
+        }
+    }
+
+    //sliders
+    piece_index=loop_slide_index[side];
+    piece=loop_slide_piece[piece_index++];
+
+    while(piece!=0){
+        ASSERT(piece_valid(piece));
+
+        for(pce_num=0;pce_num<pos->piece_num[piece];pce_num++){
+            sq=pos->piece_list[piece][pce_num];
+            ASSERT(sq_on_board(sq));
+            
+            for(index=0;index<num_dir[piece];index++){
+                dir=piece_dir[piece][index];
+                target_sq=sq+dir;
+
+                while(!square_offboard(target_sq)){
+
+                    if(pos->pieces[target_sq]!=emptyy){
+                        if(piece_color[pos->pieces[target_sq]]==(side^1)){
+                            add_capture_move(pos,move(sq,target_sq,pos->pieces[target_sq],emptyy,0),list);
+                        }
+                        break;
+                    }
+                    target_sq+=dir;
+                }
+            }
+        }
+        piece=loop_slide_piece[piece_index++];
+    }
+
+    piece_index=loop_non_slide_index[side];// black to 4 dega nhi to 0
+    piece=loop_non_slide_piece[piece_index++];
+
+    while(piece!=0){
+        ASSERT(piece_valid(piece));
+
+        for(pce_num=0;pce_num<pos->piece_num[piece];pce_num++){
+            
+            sq=pos->piece_list[piece][pce_num];
+            ASSERT(sq_on_board(sq));
+           
+            for(index=0;index<num_dir[piece];index++){
+                dir=piece_dir[piece][index];
+                target_sq=sq+dir;
+
+                if(square_offboard(target_sq))
+                    continue;
+
+                if(pos->pieces[target_sq]!=emptyy){
+                    if(piece_color[pos->pieces[target_sq]]==(side^1)){
+                        add_capture_move(pos,move(sq,target_sq,pos->pieces[target_sq],emptyy,0),list);
+                    }
+                    continue;
+                }
             }
         }
         piece=loop_non_slide_piece[piece_index++];

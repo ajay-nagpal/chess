@@ -4,9 +4,29 @@
 
 using namespace std;
 
+#define infinite 30000
+#define mate 29000
 
 static void check_up(){
     // tocheck if time up or inturrupt from gui
+    
+}
+
+static void pick_next_move(int move_num,s_movelist * list){
+    s_move temp;
+    int index=0,best_score=0;
+    int best_num=move_num;
+
+    for(index=move_num;index<list->count;index++){
+        if(list->moves[index].score>best_score){
+            best_score=list->moves[index].score;
+            best_num=index;
+        }
+
+        temp=list->moves[move_num];
+        list->moves[move_num]=list->moves[best_num];
+        list->moves[best_num]=temp;
+    }
 }
 
 static int is_repetition(const s_board * pos){
@@ -51,8 +71,72 @@ static void clear_for_search(s_board * pos,s_search_info * info){
     info->stopped=0;// if interrupt of stoop search then 1
     info->nodes=0;
 
-    info->fail_high=0,info->fail_high_first=0;
+    info->fail_high=0;
+    info->fail_high_first=0;
+}
 
+//now quesense search fun
+// in this we carry on with alpha beta fun  but we dont have depth and we dont generate captures move
+//basically in this we search all captures until they have been resolved
+// then we return evaluation of the pos  to eliminate the horizon effect
+// white ne black knight capture kr liya +300 point 
+// black ne queen caopture kr li 3 knight k brabr   to horizon  effect white loss me rha
+
+static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
+    ASSERT(check_board(pos));
+    info->nodes++;
+
+    if(is_repetition(pos) || pos->fiftymove>=100){
+        return 0;
+    }
+    if(pos->ply>maxdepth-1){// if going to deep return the eval
+        return eval_pos(pos);
+    }
+    int score=eval_pos(pos);// we didnt even make a move yet
+
+    if(score>=beta){// agar score jyada h to return beta cz we know our pos going to be better than beta
+        return beta;
+    }
+    if(score>alpha){
+        alpha=score;
+    }
+    s_movelist list[1];
+    generate_all_caps(pos,list);
+
+    int move_num=0,legal=0;// if legal move we will increment this
+    int old_alpha=alpha;// if we will found new alpha witch beat new alpha then we will sotre  best move found in pv cz we beat the old alpha we found new best move
+    int best_move=nomove;
+    score=-infinite;
+    int pvmove=probe_pvtable(pos);
+
+    for(move_num=0;move_num<list->count;move_num++){
+        pick_next_move(move_num,list);
+        
+        if(!make_move(pos,list->moves[move_num].move)){
+            continue;
+        }
+        legal++;
+        score=-quiscence(-beta,-alpha,pos,info);//negamax
+        take_move(pos);
+
+        if(score>alpha){//update alpha
+            // but if
+            if(score>=beta){// beta cut off
+                if(legal==1){
+                    info->fail_high_first++;
+                }
+                info->fail_high++;
+                return beta;
+            }
+            alpha =score;
+            best_move=list->moves[move_num].move;
+        }
+    }
+
+    if(alpha!=old_alpha){
+        store_pvmove(pos,best_move);
+    }
+    return alpha;
 }
 
 static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info * info, int do_null){
@@ -60,8 +144,9 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     
     ASSERT(check_board(pos));
     if(depth==0){
-        info->nodes++;
-        return eval_pos(pos);
+        return quiscence(alpha,beta,pos,info);
+        // info->nodes++;
+        // return eval_pos(pos);
     }
     info->nodes++;// depth is not 0 means we visited the node nincrement it
 
@@ -81,8 +166,20 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     int old_alpha=alpha;// if we will found new alpha witch beat new alpha then we will sotre  best move found in pv cz we beat the old alpha we found new best move
     int best_move=nomove;
     int score=-infinite;
+    int pvmove=probe_pvtable(pos);
+
+    if(pvmove!=nomove){
+        for(move_num=0;move_num<list->count;move_num++){
+            if(list->moves[move_num].move==pvmove){
+                list->moves[move_num].score=2000000;// jyada score means we will search it above alll move
+                break;
+            }
+        }
+    }
 
     for(move_num=0;move_num<list->count;move_num++){
+        pick_next_move(move_num,list);
+        
         if(!make_move(pos,list->moves[move_num].move)){
             continue;
         }
@@ -98,10 +195,21 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
                 }
                 info->fail_high++;
 
+                if(!(list->moves[move_num].move & move_flag_cap)){// if not a cap
+                    // 0 me 1 vala 1 me 0 valaa ese krt eh ise set
+                    pos->search_killer[1][pos->ply]=pos->search_killer[0][pos->ply];
+                    pos->search_killer[0][pos->ply]=list->moves[move_num].move;
+                }
+
                 return beta;
             }
             alpha =score;
             best_move=list->moves[move_num].move;
+            //alpha cutoff area me h to improve search history
+            if(!(list->moves[move_num].move & move_flag_cap)){// if not a cap
+                // 0 me 1 vala 1 me 0 valaa ese krt eh ise set
+                pos->search_history[pos->pieces[from_sq(best_move)]][to_sq(best_move)]+=depth;
+            }
         }
     }
     // check mate and stalemate
@@ -117,17 +225,6 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
         store_pvmove(pos,best_move);
     }
     return alpha;
-}
-
-//now quesense search fun
-// in this we carry on with alpha beta fun  but we dont have depth and we dont generate captures move
-//basically in this we search all captures until they have been resolved
-// then we return evaluation of the pos  to eliminate the horizon effect
-// white ne black knight capture kr liya +300 point 
-// black ne queen caopture kr li 3 knight k brabr   to horizon  effect white loss me rha
-
-static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
-    return 0;
 }
 
 void search_pos(s_board * pos,s_search_info * info){
@@ -164,6 +261,6 @@ void search_pos(s_board * pos,s_search_info * info){
         cout<<endl;
 
         //printf("ordering:%.2f\n",info->fail_high_first/info->fail_high);
-        cout<<"ordering: "<<fixed<<setprecision(2)<<info->fail_high_first/info->fail_high<<endl;
+        cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
     }
 }

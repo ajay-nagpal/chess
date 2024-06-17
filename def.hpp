@@ -31,8 +31,6 @@ typedef unsigned long long u64;
 #define maxmoves 2048// half moves
 
 #define maxdepth 64
-#define infinite 30000
-#define mate 29000
 
 #define max_position_on_moves 256// 1 given pos pr max move itne ho skte h
 
@@ -98,7 +96,7 @@ class s_search_info{
     // time westart searching,depth set means we only search to certain depth acc to protocol
     //
     int start_time=0,stop_time=0,depth=0,depth_set=0,time_set=0;
-    int moves_to_go=0;
+    int moves_to_go=0,infinitee=0;
     
     long nodes;// count of the pos that engine visit in search tree
     int quit=0,stopped=0;
@@ -251,6 +249,7 @@ extern int parse_move(string ptr_char,s_board* pos);
 
 // movegen.cpp
 extern void generate_all_moves(const s_board * pos,s_movelist * list);
+extern void generate_all_caps(const s_board * pos,s_movelist * list);
 extern int move_exist(s_board * pos,const int move);
 extern void init_mvvlva();
 

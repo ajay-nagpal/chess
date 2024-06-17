@@ -44,7 +44,7 @@ char * print_move(const int move){
     return mvstr;
 }
 
-//it will return a move as san integer a1a4(r/n/b/q  if any promoted)  like this
+//it will return a move as an integer a1a4(r/n/b/q  if any promoted)  like this
 int parse_move(string ptr_char,s_board* pos){//const nhi kuki move generaete krenge 
     ASSERT(check_board(pos));
     
