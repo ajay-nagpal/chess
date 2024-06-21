@@ -7,7 +7,7 @@
 
 using namespace std;
 
-//#define DEBUG
+#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -282,5 +282,8 @@ extern int get_pvline(const int depth,s_board* pos);
 
 //evaluate.cpp
 extern int eval_pos(const s_board * pos);
+
+//uci.cpp
+extern void uci_loop();
 
 #endif

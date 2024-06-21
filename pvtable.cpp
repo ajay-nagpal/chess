@@ -44,7 +44,7 @@ void init_pvtable(s_pvtable * table){
     table->num_entries=pvsize/sizeof(s_pventry);// eg 4 divide in 2 , one get 2/4
     table->num_entries -=2;// for indexing purpose
     //free(table->ptable);
-    delete(table->ptable);// table pointer jise point kr rha use free
+    //delete(table->ptable);// table pointer jise point kr rha use free
     //table->ptable = (s_pventry *) malloc(table->num_entries * sizeof(s_pventry));
     table->ptable=new s_pventry[table->num_entries];// cgp
 

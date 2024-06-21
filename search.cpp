@@ -7,8 +7,13 @@ using namespace std;
 #define infinite 30000
 #define mate 29000
 
-static void check_up(){
+static void check_up(s_search_info * info){
     // tocheck if time up or inturrupt from gui
+
+    // if we have set time limit and we ran out of time
+    if(info->time_set==true && get_time_ms()>info->stop_time){
+        info->stopped=true;
+    }
     
 }
 
@@ -84,12 +89,18 @@ static void clear_for_search(s_board * pos,s_search_info * info){
 
 static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
     ASSERT(check_board(pos));
+
+    // for every 2048 nodes chck if we ran out of time and if then stopped
+    if((info->nodes & 2047)==0){
+        check_up(info);
+    }
+
     info->nodes++;
 
     if(is_repetition(pos) || pos->fiftymove>=100){
         return 0;
     }
-    if(pos->ply>maxdepth-1){// if going to deep return the eval
+    if(pos->ply>maxdepth-1){// if going too deep return the eval
         return eval_pos(pos);
     }
     int score=eval_pos(pos);// we didnt even make a move yet
@@ -118,6 +129,10 @@ static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
         legal++;
         score=-quiscence(-beta,-alpha,pos,info);//negamax
         take_move(pos);
+
+        if(info->stopped==true){
+            return 0;// and tree will simply back ot the root
+        }
 
         if(score>alpha){//update alpha
             // but if
@@ -148,6 +163,11 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
         // info->nodes++;
         // return eval_pos(pos);
     }
+    // for every 2048 nodes chck if we ran out of time and if then stopped
+    if((info->nodes & 2047)==0){
+        check_up(info);
+    }
+
     info->nodes++;// depth is not 0 means we visited the node nincrement it
 
     if(is_repetition(pos) || pos->fiftymove>=100){// repear or pos draw
@@ -186,6 +206,10 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
         legal++;
         score=-alpha_beta(-beta,-alpha,depth-1,pos,info,true);//negamax
         take_move(pos);
+
+        if(info->stopped==true){
+            return 0;
+        }
 
         if(score>alpha){//update alpha
             // but if
@@ -248,10 +272,16 @@ void search_pos(s_board * pos,s_search_info * info){
 
         // agar yha out of time aa gya to prev moev vgera return return 
         
+        // quiscensce me jb tree back to root (stopped ke baaad) to yha aate h
+        // so here  before getting best move or pv move
+        if(info->stopped==true){
+            break;
+        }
+        
         pv_moves=get_pvline(curr_depth,pos);
         best_move=pos->pvarray[0];// set ist move the best move
-
-        cout<<endl<<"depth: "<<curr_depth<<" score: "<<best_score<<" move: "<<print_move(best_move)<<" nodes: "<<info->nodes<<endl;
+        // gui ko send krne ke hisab se print
+        cout<<endl<<"info score cp  "<<best_score<<" depth: "<<curr_depth<<" nodes: "<<info->nodes<<" time: "<<get_time_ms()-info->start_time<<endl;
 
         pv_moves=get_pvline(curr_depth,pos);// vice me max jesa
         cout<<"pv: ";
@@ -263,4 +293,9 @@ void search_pos(s_board * pos,s_search_info * info){
         //printf("ordering:%.2f\n",info->fail_high_first/info->fail_high);
         cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
     }
+    // prev moev ka best move etc send kro gui ko agar break krkre loop se bahr a ajaye kuki stopped aa gya
+    // at the en d of search we will send best move
+    // info score cp 13 depth 1 nodes 13 time 15 pv f1b5
+    cout<<"best move "<<print_move(best_move)<<endl;
+
 }

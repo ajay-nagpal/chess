@@ -245,7 +245,7 @@ int check_board(const s_board *pos){
     vector<int> temp_minor_piece{0,0};
     vector<int> temp_material{0,0};
 
-    int sq64,temp_piece,temp_piece_num,sq120,color,pcount;
+    int sq64=0,temp_piece=0,temp_piece_num=0,sq120=0,color=0,pcount=0;
 
     vector<u64> temp_pawns={0ULL,0ULL,0ULL};
 
