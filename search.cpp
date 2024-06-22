@@ -14,7 +14,7 @@ static void check_up(s_search_info * info){
     if(info->time_set==true && get_time_ms()>info->stop_time){
         info->stopped=true;
     }
-    
+    //read_input(info);
 }
 
 static void pick_next_move(int move_num,s_movelist * list){
@@ -72,7 +72,7 @@ static void clear_for_search(s_board * pos,s_search_info * info){
 
     pos->ply=0;// number of half moves played in the current search  so =0 before every search
 
-    info->start_time=get_time_ms();// stop time fun that connect to the gui me set hoga
+    //info->start_time=get_time_ms();//  uci.cpp parse go me set krenfge baad me
     info->stopped=0;// if interrupt of stoop search then 1
     info->nodes=0;
 
@@ -290,12 +290,11 @@ void search_pos(s_board * pos,s_search_info * info){
         }
         cout<<endl;
 
-        //printf("ordering:%.2f\n",info->fail_high_first/info->fail_high);
-        cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
+        //cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
     }
     // prev moev ka best move etc send kro gui ko agar break krkre loop se bahr a ajaye kuki stopped aa gya
     // at the en d of search we will send best move
     // info score cp 13 depth 1 nodes 13 time 15 pv f1b5
-    cout<<"best move "<<print_move(best_move)<<endl;
+    cout<<endl<<"best move "<<print_move(best_move)<<endl;
 
 }

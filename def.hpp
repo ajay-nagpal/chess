@@ -272,6 +272,7 @@ extern void search_pos(s_board * pos,s_search_info * info);
 
 //misc.cpp
 extern int get_time_ms();
+//extern void read_input(s_search_info *info);
 
 //pvtable.cpp
 extern void init_pvtable(s_pvtable * table);
