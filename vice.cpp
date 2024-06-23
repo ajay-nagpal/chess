@@ -12,7 +12,41 @@ using namespace std;
 int main(){
     AllInit();
     
-    uci_loop();
+    s_board pos[1];
+    s_search_info info[1];
+    init_pvtable(pos->pvtable);
+    
+    cout<<"welcome to Vice!. type 'vice' for console mode..."<<endl;
+    string line;
+
+    while(1){
+        cout<<"enter line"<<endl;
+        getline(cin,line);
+
+        if(line=="uci"){
+            uci_loop(pos,info);
+            if(info->quit==true)
+                break;
+            continue;
+        }
+        else if(line=="xboard"){
+            xboard_loop(pos,info);
+            if(info->quit==true)
+                break;
+            continue;
+        }
+        else if(line=="vice"){
+            console_loop(pos,info);
+            if(info->quit==true)
+                break;
+            continue;
+        }
+        else if(line=="quit"){
+            break;
+        }
+    }
+    //uci_loop(); // to check till uci
+    delete(pos->pvtable->ptable);
     return 0;
 }
 

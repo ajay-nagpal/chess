@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define DEBUG
+//#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -54,6 +54,7 @@ enum board120{
 
 enum castle{wkca=1,wqca=2,bkca=4,bqca=8};
 
+enum mode{uci_mode,xboard_mode,console_mode};
 
 class s_move{
     public:
@@ -110,6 +111,9 @@ class s_search_info{
     float fail_high=0,fail_high_first=0;// will use for move ordereing short  form fh and fhf 
     //One is the nember of times we get > beta on the first move, the other is the total > beta counts.
     // It gives you an idea of how good your move ordering is. You want to be > 90%
+
+    int game_mode=0;
+    int post_thinking=0;
 };
 
 class s_board {
@@ -286,5 +290,10 @@ extern int eval_pos(const s_board * pos);
 
 //uci.cpp
 extern void uci_loop();
+extern void uci_loop(s_board * pos, s_search_info * info);
+
+//xboard.cpp
+extern void xboard_loop(s_board * pos, s_search_info * info);
+extern void console_loop(s_board* pos, s_search_info *info);
 
 #endif

@@ -14,10 +14,10 @@ void parse_go(string line, s_search_info * info, s_board * pos){
 
     size_t index=0;
 
-    // if(s.find("infinite")!=string::npos){
-    //     ;// if nothing happens then no need to add
-    // }
-    
+    if(line.find("infinite")!=string::npos){
+        ;
+    }
+
     index=line.find("winc");
     if(index!=string::npos && pos->side==white){
         inc=stoi(line.substr(index+5));
@@ -122,15 +122,17 @@ void parse_pos(string line_in, s_board * pos){
     print_board(pos);
 }
 
-void uci_loop(){
+void uci_loop(s_board * pos, s_search_info * info){
 
     cout<<"id name "<<NAME<<endl;
     cout<<"id author Ajay"<<endl;
     cout<<"uci ok"<<endl;
 
-    s_board pos[1];
-    s_search_info info[1];
-    init_pvtable(pos->pvtable);
+    // is uci me hmne kiya pass
+    // main me define krek send kreng e as an argument
+    //s_board pos[1];
+    //s_search_info info[1];
+    //init_pvtable(pos->pvtable);
 
     string line;
 
@@ -165,5 +167,6 @@ void uci_loop(){
             break;
         }
     }
-    delete(pos->pvtable->ptable);
+    // isliye iske bhi jrrort nhi main me kr denge jha se pass hoga
+    //delete(pos->pvtable->ptable);
 }

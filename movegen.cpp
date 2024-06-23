@@ -104,7 +104,8 @@ static void add_quite_move(const s_board * pos,int move,s_movelist * list){
 static void add_capture_move(const s_board * pos,int move,s_movelist * list){
     ASSERT(sq_on_board(from_sq(move)));
     ASSERT(sq_on_board(to_sq(move)));
-    ASSERT(piece_valid(captured(move)));
+    //ASSERT(piece_valid(captured(move)));
+    ASSERT(piece_valid_empty(captured(move)));
 
     list->moves[list->count].move=move;
     // score mvvlva se set
@@ -151,8 +152,9 @@ static void add_white_pawn_move(const s_board * pos , const int from, const int 
         add_capture_move(pos,move(from,to,emptyy,wb,0),list);
         add_capture_move(pos,move(from,to,emptyy,wn,0),list);
     }    
-    else   
-        add_capture_move(pos,move(from,to,emptyy,emptyy,0),list);          
+    else{
+        add_capture_move(pos,move(from,to,emptyy,emptyy,0),list);
+    }         
 }
 
 static void add_black_pawn_cap_move(const s_board * pos , const int from, const int to,
@@ -218,10 +220,8 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
 
     if(side==white){ 
         for(pce_num=0;pce_num<pos->piece_num[wp];pce_num++){// loop through all white pawns on the board
-
             sq=pos->piece_list[wp][pce_num];
             ASSERT(sq_on_board(sq));
-        
             if(pos->pieces[sq+10]==emptyy){
                 add_white_pawn_move(pos,sq,sq+10,list);
                 if(rank_board[sq]==r2 && pos->pieces[sq+20]==emptyy){ 
@@ -241,15 +241,12 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
                 if(sq+9==pos->enpass){
                     add_enpass_move(pos,move(sq,sq+9,emptyy,emptyy,move_flag_ep),list);
                 }   
-
                 if(sq+11==pos->enpass){
                     add_enpass_move(pos,move(sq,sq+11,emptyy,emptyy,move_flag_ep),list);
                 }
             }
         }
-
         // for castling king side and queen side
-
         if(pos->castle_perm & wkca ){
             if(pos->pieces[f1]==emptyy && pos->pieces[g1]==emptyy){
                 if(!square_attacked(e1,black,pos) && !square_attacked(f1,black,pos)){
@@ -257,7 +254,6 @@ void generate_all_moves(const s_board * pos,s_movelist * list){
                 }
             }
         }
-
         if(pos->castle_perm & wqca ){
             if(pos->pieces[d1]==emptyy && pos->pieces[c1]==emptyy && pos->pieces[b1]==emptyy){
                 if(!square_attacked(e1,black,pos) && !square_attacked(d1,black,pos)){

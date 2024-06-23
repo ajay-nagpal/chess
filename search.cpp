@@ -170,7 +170,8 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
 
     info->nodes++;// depth is not 0 means we visited the node nincrement it
 
-    if(is_repetition(pos) || pos->fiftymove>=100){// repear or pos draw
+    if((is_repetition(pos) || pos->fiftymove>=100) && pos->ply){// repeat or pos draw
+    // for this we must have at least 1 move otherwise how can we have a drwa thats why we checkd for pos->ply
         return 0;
     }
 
@@ -196,7 +197,6 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
             }
         }
     }
-
     for(move_num=0;move_num<list->count;move_num++){
         pick_next_move(move_num,list);
         
@@ -281,20 +281,48 @@ void search_pos(s_board * pos,s_search_info * info){
         pv_moves=get_pvline(curr_depth,pos);
         best_move=pos->pvarray[0];// set ist move the best move
         // gui ko send krne ke hisab se print
-        cout<<endl<<"info score cp  "<<best_score<<" depth: "<<curr_depth<<" nodes: "<<info->nodes<<" time: "<<get_time_ms()-info->start_time<<endl;
+        // if else se teeno mode ke print krne ka likhna h
+        // uci,xboard,console
+        //cout<<endl<<"info score cp  "<<best_score<<" depth: "<<curr_depth<<" nodes: "<<info->nodes<<" time: "<<get_time_ms()-info->start_time<<endl;
 
-        pv_moves=get_pvline(curr_depth,pos);// vice me max jesa
-        cout<<"pv: ";
-        for(pv_num=0;pv_num<pv_moves;pv_num++){
-            cout<<print_move(pos->pvarray[pv_num])<<" ";
+        if(info->game_mode==uci_mode){
+            cout<<"info score cp  "<<best_score<<" depth: "<<curr_depth<<
+                  " nodes: "<<info->nodes<<" time: "<<get_time_ms()-info->start_time<<endl;
         }
-        cout<<endl;
-
+        else if(info->game_mode==xboard_mode && info->post_thinking==true){
+            cout<<curr_depth<<" "<<best_score<<" "<<(get_time_ms()-info->start_time)/10<<
+                " "<<info->nodes<<endl;
+        }
+        else if(info->post_thinking==true){
+            cout<<"score: "<<best_score<<" depth: "<<curr_depth<<
+                  " nodes: "<<info->nodes<<" time: "<<get_time_ms()-info->start_time<<"(ms)"<<endl;
+        }
+        if(info->game_mode==uci_mode || info->post_thinking==true){
+            pv_moves=get_pvline(curr_depth,pos);// vice me max jesa
+            cout<<"pv: ";
+            for(pv_num=0;pv_num<pv_moves;pv_num++){
+                cout<<print_move(pos->pvarray[pv_num])<<" ";
+            }
+            cout<<endl;
+        }
         //cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
     }
+
     // prev moev ka best move etc send kro gui ko agar break krkre loop se bahr a ajaye kuki stopped aa gya
     // at the en d of search we will send best move
     // info score cp 13 depth 1 nodes 13 time 15 pv f1b5
-    cout<<endl<<"best move "<<print_move(best_move)<<endl;
+    //cout<<endl<<"best move "<<print_move(best_move)<<endl;
 
+    if(info->game_mode==uci_mode){
+        cout<<"best move "<<print_move(best_move)<<endl;
+    }
+    else if(info->game_mode==xboard_mode){
+        cout<<"move "<<print_move(best_move)<<endl;
+        make_move(pos,best_move);
+    }
+    else{
+        cout<<endl<<endl<<"***!! Vice makes move "<<print_move(best_move)<<" !!***"<<endl<<endl;
+        make_move(pos,best_move);
+        print_board(pos);// so that user ca see currr board state
+    }
 }
