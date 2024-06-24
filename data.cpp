@@ -35,10 +35,11 @@ vector<bool>piece_bishop_queen{ false, false, false, true, false, true, false, f
 vector<bool>piece_slide       { false, false, false, true, true, true, false, false, false, true, true, true, false };
 // it is true where th epiece is sliding piece like queen rook bishop
 
+//to get mirror square
+// jese a2 pr h to uska mirror black ka a7 pr hoga to a7 ka square return 
+// 64 ka ek array mirror
 
-
-
-vector<int>mirror64{
+vector<int> mirror= {
 56	,	57	,	58	,	59	,	60	,	61	,	62	,	63	,
 48	,	49	,	50	,	51	,	52	,	53	,	54	,	55	,
 40	,	41	,	42	,	43	,	44	,	45	,	46	,	47	,

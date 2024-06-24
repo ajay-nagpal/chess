@@ -7,7 +7,7 @@
 
 using namespace std;
 
-//#define DEBUG
+#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -191,6 +191,8 @@ class s_board {
 #define is_kn(p) (piece_knight[(p)])
 #define is_ki(p) (piece_king[(p)])
 
+#define mirror64(sq) (mirror[sq])
+
 extern vector<int> sq120to64;
 extern vector<int> sq64to120;
 
@@ -223,6 +225,15 @@ extern vector<bool> piece_rook_queen;
 extern vector<bool> piece_bishop_queen;
 extern vector<bool> piece_slide;
 
+extern vector<int> mirror;
+
+extern vector<u64> file_bb_mask;// index by rank and file number
+extern vector<u64> rank_bb_mask;
+
+extern vector<u64> black_passed_mask;
+extern vector<u64> white_passed_mask;
+extern vector<u64> isolated_mask;
+
 //init.cpp
 extern void AllInit();
 extern void init_file_rank_board();
@@ -241,6 +252,7 @@ extern int parse_fen(const char * fen ,s_board * pos);
 extern void print_board(const s_board *pos);
 extern void update_list_material(s_board *pos);
 extern int check_board(const s_board *pos);
+extern void mirror_board(s_board * pos);
 
 // attack.cpp
 extern int square_attacked(const int sq,const int side, const s_board *pos);
@@ -263,6 +275,7 @@ extern int side_valid(const int side);
 extern int file_rank_valid(const int fr);
 extern int piece_valid_empty(const int piece);
 extern int piece_valid(const int piece);
+extern void mirror_eval_test(s_board *pos);
 
 //makemove.cpp
 extern int make_move(s_board * pos,int move);

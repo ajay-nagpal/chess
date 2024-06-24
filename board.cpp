@@ -339,5 +339,59 @@ int check_board(const s_board *pos){
     ASSERT(pos->castle_perm >= 0 && pos->castle_perm <= 15);
 
     return true;
+}
 
+void mirror_board(s_board * pos){
+    vector<int>temp_pieces_array(64);
+    int temp_side=pos->side^1;// mirror side
+    vector<int>swap_piece={emptyy,bp,bn,bb,br,bq,bk,wp,wn,wb,wr,wq,wk};// mirror 64m macro se 
+    // put wn in index will get bn and will sswap the pieces
+    int temp_castle_perm=0;
+    int temp_enpass=no_sq;
+
+    int sq,tp;
+
+    if(pos->castle_perm & wkca)// is white can castle king side 
+        temp_castle_perm|=bkca;//then in mirror pos black can castle king side
+    if(pos->castle_perm & wqca)
+        temp_castle_perm|=bqca;
+    if(pos->castle_perm & bkca)
+        temp_castle_perm|=wkca;
+    if(pos->castle_perm & bqca)
+        temp_castle_perm|=wqca;
+
+    if(pos->enpass!=no_sq){// need to mirror the enpass sq
+        //let mana e3 h enpass to mirror pos me e6 hogi
+        // but mirror 64 index based h
+        //so convert  enpass sq to 64 based by sq64  get it mirror 64 sq
+        // convert back to 120 based to set new enpass sq
+        temp_enpass=SQ120(mirror[SQ64(pos->enpass)]);
+    }
+    for(sq=0;sq<64;sq++){
+        // temp piece sarray 64 inddexx h
+        // menns get the piece formm pieces array  in the pos of 120 based and checking for mirror sq
+        // mirror sq isliye cz let say we want to find out what is on  
+        //sq b7 so we would be asking for mirror of b7   means b2 pr konsa piece h
+        // ye 64 based h pieces array ko 120 based so convert to 120
+        temp_pieces_array[sq]=pos->pieces[SQ120(mirror[sq])];
+    }
+
+    reset_board(pos);
+    
+    for(sq=0;sq<64;sq++){// loop through all pieces on temp pieces array
+        //get that piece back out
+        //let say inf piece on b2 is wn then it would be   bn and place it on b7 on 120 based
+        tp=swap_piece[temp_pieces_array[sq]];
+        // 120 base me place 
+        pos->pieces[SQ120(sq)]=tp;
+    }
+
+    pos->side=temp_side;
+    pos->castle_perm=temp_castle_perm;
+    pos->enpass=temp_enpass;
+
+    pos->poskey=generate_pos_key(pos);
+    update_list_material(pos);
+
+    ASSERT(check_board(pos));
 }

@@ -178,6 +178,12 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     if(pos->ply>maxdepth-1){
         return eval_pos(pos);
     }
+    // agar chcek me ho to depth ++ cz we can examine wide depth in advance
+    int in_check=square_attacked(pos->king_sq[pos->side],pos->side^1,pos);
+
+    if(in_check==true){
+        depth++;
+    }
 
     //vector<s_movelist> list(1);
     s_movelist list[1];
@@ -238,7 +244,8 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     }
     // check mate and stalemate
     if(legal==0){
-        if(square_attacked(pos->king_sq[pos->side],pos->side^1,pos)){
+        // if we are in check =square_attacked(pos->king_sq[pos->side],pos->side^1,pos)
+        if(in_check){
             return -mate+pos->ply;//pos->ply gives distance to mate from the root
         }
         else{// not a mate then its stalemate and thats draw return 0

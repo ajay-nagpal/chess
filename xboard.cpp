@@ -293,7 +293,6 @@ void console_loop(s_board* pos, s_search_info *info){
             }
             search_pos(pos,info);
         }
-        cout<<"Vice >"<<endl;
         
         cout<<"enter line"<<endl;
         getline(cin,line);
@@ -318,7 +317,27 @@ void console_loop(s_board* pos, s_search_info *info){
             cout<<"enter moves using b7b8q notation"<<endl;
             continue;
         }
+        if(command=="mirror"){
+            engine_side=both;
+            mirror_eval_test(pos);
+            continue;
+        }
+        if(command== "eval"){
+			print_board(pos);
+			cout<<"eval: "<<eval_pos(pos)<<endl;
+			mirror_board(pos);
+			print_board(pos);
+			cout<<"eval: "<<eval_pos(pos)<<endl;
+			continue;
+		}
 
+		if(command=="setboard"){
+            engine_side=both;// in force mode cz side both set kr di
+            string s=line.substr(9);
+            const char * fen=s.c_str();
+            parse_fen(fen,pos);
+            continue;
+		}
         if(command=="quit"){
             info->quit=true;
             break;

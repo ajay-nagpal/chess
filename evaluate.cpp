@@ -3,6 +3,11 @@
 
 using namespace std;
 
+const int pawn_isolated=-10;// penalty for isolated pawn
+// bonus for passed pawn index this  by rank
+const vector<int>pawn_passed={0,5,10,20,35,60,100,200};
+const int rook_open_file=5;
+
 // fun to return evaluate score of a pos  in hundreads of pawn
 const vector<int> pawn_table= {// values are in 100s of a apawn means 10==.1
 0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,
@@ -70,23 +75,6 @@ const vector<int> king_O = {
 	-70	,	-70	,	-70	,	-70	,	-70	,	-70	,	-70	,	-70		
 };
 
-//to get mirror square
-// jese a2 pr h to uska mirror black ka a7 pr hoga to a7 ka square return 
-// 64 ka ek array mirror
-
-vector<int> mirror= {
-56	,	57	,	58	,	59	,	60	,	61	,	62	,	63	,
-48	,	49	,	50	,	51	,	52	,	53	,	54	,	55	,
-40	,	41	,	42	,	43	,	44	,	45	,	46	,	47	,
-32	,	33	,	34	,	35	,	36	,	37	,	38	,	39	,
-24	,	25	,	26	,	27	,	28	,	29	,	30	,	31	,
-16	,	17	,	18	,	19	,	20	,	21	,	22	,	23	,
-8	,	9	,	10	,	11	,	12	,	13	,	14	,	15	,
-0	,	1	,	2	,	3	,	4	,	5	,	6	,	7
-};
-	
-#define mirror64(sq) (mirror[sq])
-
 int eval_pos(const s_board * pos){
 
     int piece=0,piece_num=0,sq=0;
@@ -95,9 +83,24 @@ int eval_pos(const s_board * pos){
     // movegen jesa code thoda boht
     piece=wp;
     for(piece_num=0;piece_num<pos->piece_num[piece];piece_num++){
-        sq=pos->piece_list[piece][piece_num];
+        sq=pos->piece_list[piece][piece_num];// 120 based
         ASSERT(sq_on_board(sq));
         score+=pawn_table[SQ64(sq)];
+        /*
+            101
+            101
+            101 let middle 0 ki jgh pawn to if we and  this mask with white pawn and result is zero
+            thjen isolated pawn
+        */
+        if( (isolated_mask[SQ64(sq)] & pos->pawns[white]) == 0) {// and with bitboard
+			cout<<"wp iso: "<<print_sq(sq)<<endl;
+			score += pawn_isolated;
+		}
+		
+		if( (white_passed_mask[SQ64(sq)] & pos->pawns[black]) == 0) {
+            cout<<"wp passed: "<<print_sq(sq)<<endl;
+			score += pawn_passed[rank_board[sq]];
+		}
     }
 
     piece=bp;
@@ -105,6 +108,16 @@ int eval_pos(const s_board * pos){
         sq=pos->piece_list[piece][piece_num];
         ASSERT(sq_on_board(sq));
         score-=pawn_table[mirror64(SQ64(sq))];
+
+        if( (isolated_mask[SQ64(sq)] & pos->pawns[black]) == 0) {// and with bitboard
+			cout<<"bp iso: "<<print_sq(sq)<<endl;
+			score -= pawn_isolated;// cz black wants to be score more negative// --10 means +10 so it added that neg score
+		}
+		
+		if( (black_passed_mask[SQ64(sq)] & pos->pawns[white]) == 0) {// mean shteer are no white pawn tha twill stop it from prom
+            cout<<"bp passed: "<<print_sq(sq)<<endl;
+			score -= pawn_passed[7-rank_board[sq]];// cz pawn passed index byr rank h aur black down the board jata h to 7-
+		}
     }
 
     piece=wn;

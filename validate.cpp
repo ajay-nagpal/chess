@@ -1,4 +1,7 @@
 #include"def.hpp"
+#include <fstream>
+#include<iostream>
+using namespace std;
 
 int  sq_on_board(const int sq){
     return file_board[sq]==OFFBOARD?0:1;
@@ -18,4 +21,44 @@ int piece_valid_empty(const int piece){
 
 int piece_valid(const int piece){
     return (piece>=wp && piece<=bk)?1:0;
+}
+
+void mirror_eval_test(s_board *pos) {
+    ifstream file("mirror.epd");
+
+    string line;
+    int ev1 =0 ,ev2 = 0;
+    int positions = 0;
+
+    if(!file.is_open()){
+        cout<< "file not found" << endl;
+        return;
+    }  
+    else {
+        while(getline(file,line)){
+            const char * s=line.c_str();
+            parse_fen(s, pos);
+            positions++;
+            ev1 = eval_pos(pos);
+            mirror_board(pos);
+            ev2 = eval_pos(pos);
+
+            if(ev1 != ev2) {
+                cout<<endl;
+                parse_fen(s, pos);
+                
+                print_board(pos);
+                mirror_board(pos);
+                print_board(pos);
+
+                cout<<endl<<"mirror fail:"<<line<<endl;
+
+                cin.get();
+                return;
+            }
+            if( (positions % 1000) == 0)   {
+                cout<<"position "<<positions<<endl;
+            }
+        }
+    }
 }
