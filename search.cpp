@@ -68,7 +68,7 @@ static void clear_for_search(s_board * pos,s_search_info * info){
             pos->search_killer[index][index2]=0;
         }
     }
-    clear_pvtable(pos->pvtable);// for new search clear old pv
+    clear_hash_table(pos->pvtable);// for new search clear old pv
 
     pos->ply=0;// number of half moves played in the current search  so =0 before every search
 
@@ -76,8 +76,8 @@ static void clear_for_search(s_board * pos,s_search_info * info){
     info->stopped=0;// if interrupt of stoop search then 1
     info->nodes=0;
 
-    info->fail_high=0;
-    info->fail_high_first=0;
+    info->fh=0;
+    info->fhf=0;
 }
 
 //now quesense search fun
@@ -138,9 +138,9 @@ static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
             // but if
             if(score>=beta){// beta cut off
                 if(legal==1){
-                    info->fail_high_first++;
+                    info->fhf++;
                 }
-                info->fail_high++;
+                info->fh++;
                 return beta;
             }
             alpha =score;
@@ -154,7 +154,9 @@ static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
     return alpha;
 }
 
-static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info * info, int do_null){
+static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info * info,
+                         int do_null){// cant gave 2 nulll move in  a row that why in normal alpha beta
+                         // it was set true  then nnull move me fasle set
     // do_numm is a permission wheather we can make null move or not
     
     ASSERT(check_board(pos));
@@ -184,16 +186,41 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     if(in_check==true){
         depth++;
     }
+    int score =-infinite;// prep for null move
+    int pvmove=nomove;
 
-    //vector<s_movelist> list(1);
+    if( probe_hash_entry(pos, &pvmove, &score, alpha, beta, depth) == true ) {
+		pos->hash_table->cut++;
+		return score;
+	}
+
+
+    if(do_null && !in_check && pos->ply && (pos->big_pieces[pos->side]>0) && depth>=4){
+        //chceking pos->ply menas we made atleast 1 move
+    
+        make_null_move(pos);
+        score = -alpha_beta( -beta, -beta + 1, depth-4, pos, info, false);//edpth-1 but 1 null and it get 2 extra so depth-1-1-2
+        // alpha beta call with donull false so that no 2 null move at once
+        take_null_move(pos);
+		if(info->stopped == true){
+			return 0;
+		}
+        if (score >= beta) {
+			//info->null_cut++;
+			return beta;
+		}
+    }
+
     s_movelist list[1];
     generate_all_moves(pos,list);
 
     int move_num=0,legal=0;// if legal move we will increment this
     int old_alpha=alpha;// if we will found new alpha witch beat new alpha then we will sotre  best move found in pv cz we beat the old alpha we found new best move
     int best_move=nomove;
-    int score=-infinite;
-    int pvmove=probe_pvtable(pos);
+    int best_score=-infinite;
+
+    //reset score here
+    score=-infinite;
 
     if(pvmove!=nomove){
         for(move_num=0;move_num<list->count;move_num++){
@@ -217,28 +244,36 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
             return 0;
         }
 
-        if(score>alpha){//update alpha
+        if(score>best_score){// even if we dont beat alpha we will store best move found at pos
+            best_score=score;
+            best_move=list->moves[move_num].move;
+            if(score>alpha){//update alpha
             // but if
-            if(score>=beta){// beta cut off
-                if(legal==1){
-                    info->fail_high_first++;
-                }
-                info->fail_high++;
+                if(score>=beta){// beta cut off
+                    if(legal==1){
+                        info->fhf++;
+                    }
+                    info->fh++;
 
+                    if(!(list->moves[move_num].move & move_flag_cap)){// if not a cap
+                        // 0 me 1 vala 1 me 0 valaa ese krt eh ise set
+                        pos->search_killer[1][pos->ply]=pos->search_killer[0][pos->ply];
+                        pos->search_killer[0][pos->ply]=list->moves[move_num].move;
+                    }
+
+                    // and if we beat beta
+                    // then we will store hash entry which prev war pv entry
+                    store_hash_entry(pos,best_move,beta,hf_beta,depth);
+
+                    return beta;
+                }
+                alpha =score;
+                best_move=list->moves[move_num].move;
+                //alpha cutoff area me h to improve search history
                 if(!(list->moves[move_num].move & move_flag_cap)){// if not a cap
                     // 0 me 1 vala 1 me 0 valaa ese krt eh ise set
-                    pos->search_killer[1][pos->ply]=pos->search_killer[0][pos->ply];
-                    pos->search_killer[0][pos->ply]=list->moves[move_num].move;
+                    pos->search_history[pos->pieces[from_sq(best_move)]][to_sq(best_move)]+=depth;
                 }
-
-                return beta;
-            }
-            alpha =score;
-            best_move=list->moves[move_num].move;
-            //alpha cutoff area me h to improve search history
-            if(!(list->moves[move_num].move & move_flag_cap)){// if not a cap
-                // 0 me 1 vala 1 me 0 valaa ese krt eh ise set
-                pos->search_history[pos->pieces[from_sq(best_move)]][to_sq(best_move)]+=depth;
             }
         }
     }
@@ -253,7 +288,11 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
         }
     }
     if(alpha!=old_alpha){
-        store_pvmove(pos,best_move);
+        store_hash_entry(pos,best_move,best_score,hf_exact,depth);// we have exact score so edxact flag
+    }
+    else{
+        store_hash_entry(pos,best_move,best_score,hf_exact,depth);
+
     }
     return alpha;
 }
@@ -312,7 +351,7 @@ void search_pos(s_board * pos,s_search_info * info){
             }
             cout<<endl;
         }
-        //cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fail_high_first/info->fail_high)<<endl;
+        //cout<<"ordering: "<<fixed<<setprecision(2)<<(info->fhf/info->fh)<<endl;
     }
 
     // prev moev ka best move etc send kro gui ko agar break krkre loop se bahr a ajaye kuki stopped aa gya

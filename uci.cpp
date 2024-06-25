@@ -132,7 +132,7 @@ void uci_loop(s_board * pos, s_search_info * info){
     // main me define krek send kreng e as an argument
     //s_board pos[1];
     //s_search_info info[1];
-    //init_pvtable(pos->pvtable);
+    //init_hash_table(pos->pvtable);
 
     string line;
 

@@ -14,7 +14,7 @@ int main(){
     
     s_board pos[1];
     s_search_info info[1];
-    init_pvtable(pos->pvtable);
+    init_hash_table(pos->pvtable);
     
     cout<<"welcome to Vice!. type 'vice' for console mode..."<<endl;
     string line;

@@ -56,7 +56,7 @@ void mirror_eval_test(s_board *pos) {
                 cin.get();
                 return;
             }
-            if( (positions % 1000) == 0)   {
+            if( (positions % 3) == 0)   {//1000
                 cout<<"position "<<positions<<endl;
             }
         }

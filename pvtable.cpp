@@ -31,8 +31,8 @@ int get_pvline(const int depth,s_board* pos){// depth we want ot print pv to
     return count;
 }
 
-void clear_pvtable(s_pvtable * table){
-    s_pventry * pventry;// pointer to entry
+void clear_hash_table(s_hash_table * table){
+    s_hash_entry * pventry;// pointer to entry
     // loop through every entry in the table
     for(pventry=table->ptable; pventry<table->ptable + table->num_entries ; pventry++){
         pventry->poskey=0ULL;
@@ -40,15 +40,15 @@ void clear_pvtable(s_pvtable * table){
     }
 }
 
-void init_pvtable(s_pvtable * table){
-    table->num_entries=pvsize/sizeof(s_pventry);// eg 4 divide in 2 , one get 2/4
+void init_hash_table(s_hash_table * table){
+    table->num_entries=pvsize/sizeof(s_hash_entry);// eg 4 divide in 2 , one get 2/4
     table->num_entries -=2;// for indexing purpose
     //free(table->ptable);
     //delete(table->ptable);// table pointer jise point kr rha use free
-    //table->ptable = (s_pventry *) malloc(table->num_entries * sizeof(s_pventry));
-    table->ptable=new s_pventry[table->num_entries];// cgp
+    //table->ptable = (s_hash_entry *) malloc(table->num_entries * sizeof(s_hash_entry));
+    table->ptable=new s_hash_entry[table->num_entries];// cgp
 
-    clear_pvtable(table);
+    clear_hash_table(table);
     cout<<endl<<"pvtable init complete with "<<table->num_entries<<" entries"<<endl;
 }
 

@@ -414,3 +414,55 @@ void take_move(s_board *pos){
 
     ASSERT(check_board(pos));
 }
+
+void make_null_move(s_board * pos){
+    // we do thingsd we do in make move but we will nmot make a amove
+    ASSERT(check_board(pos));
+    ASSERT(!square_attacked(pos->king_sq[pos->side],pos->side^1,pos));
+    // means ASSERT(!incheck);
+
+    pos->ply++;
+    pos->history[pos->hisply].poskey = pos->poskey;
+
+    if(pos->enpass!=no_sq)
+        hash_enpass;
+    
+    // storing in a history array of our condn
+    
+    pos->history[pos->hisply].moves = nomove;
+    pos->history[pos->hisply].fiftymove = pos->fiftymove;
+    pos->history[pos->hisply].enpass = pos->enpass;
+    pos->history[pos->hisply].castle_perm = pos->castle_perm;
+    pos->enpass = no_sq;
+
+    // switching side hashing  side
+    pos->side ^= 1;
+    pos->hisply++;
+    hash_side;
+    ASSERT(check_board(pos));
+    return;
+}
+
+void take_null_move(s_board *pos) {
+    ASSERT(check_board(pos));
+
+    // take back null move by decrementing ply hisply
+    pos->hisply--;
+    pos->ply--;
+    // hashing enpass
+    if(pos->enpass != no_sq) 
+        hash_enpass;
+
+    // setting back the permissions
+    pos->castle_perm = pos->history[pos->hisply].castle_perm;
+    pos->fiftymove = pos->history[pos->hisply].fiftymove;
+    pos->enpass = pos->history[pos->hisply].enpass;
+
+    if(pos->enpass != no_sq)
+        hash_enpass;
+    // changing side
+    pos->side ^= 1;
+    hash_side;
+  
+    ASSERT(check_board(pos));
+}

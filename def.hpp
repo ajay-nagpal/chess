@@ -36,127 +36,6 @@ typedef unsigned long long u64;
 
 #define start_fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-enum piece{emptyy,wp,wn,wb,wr,wq,wk,bp,bn,bb,br,bq,bk};
-enum file{fa,fb,fc,fd,fe,ff,fg,fh,fn};
-enum rank{r1,r2,r3,r4,r5,r6,r7,r8,rn};
-enum color{white,black,both};
-
-enum board120{
-    a1=21,b1,c1,d1,e1,f1,g1,h1,
-    a2=31,b2,c2,d2,e2,f2,g2,h2,
-    a3=41,b3,c3,d3,e3,f3,g3,h3,
-    a4=51,b4,c4,d4,e4,f4,g4,h4,
-    a5=61,b5,c5,d5,e5,f5,g5,h5,
-    a6=71,b6,c6,d6,e6,f6,g6,h6,
-    a7=81,b7,c7,d7,e7,f7,g7,h7,
-    a8=91,b8,c8,d8,e8,f8,g8,h8,no_sq,OFFBOARD
-};
-
-enum castle{wkca=1,wqca=2,bkca=4,bqca=8};
-
-enum mode{uci_mode,xboard_mode,console_mode};
-
-class s_move{
-    public:
-
-    int move;
-    int score;
-};
-
-class s_movelist{
-    public:
-    
-    int count;//count of the number of move on the movelist
-    vector<s_move>moves=vector<s_move>(max_position_on_moves);
-};
-
-class s_pventry{// if we find move that beat alpha then we store move and poskey that led to that move
-    public:
-
-    u64 poskey;
-    int move;
-};
-
-class s_pvtable{// actual class for the table 
-    public:
-
-    s_pventry * ptable;// we will allocate momeory to this pointer depending on how many entries we want to store
-    int num_entries;
-};
-
-class s_undo{
-    public:
-
-    int moves,castle_perm,enpass,fiftymove;
-    u64 poskey;
-};
-
-class s_search_info{
-    public:
-
-    // time westart searching,depth set means we only search to certain depth acc to protocol
-    //
-    int start_time=0,stop_time=0,depth=0,depth_set=0,time_set=0;
-    int moves_to_go=0,infinitee=0;
-    
-    long nodes;// count of the pos that engine visit in search tree
-    int quit=0,stopped=0;
-    // get intrupted during a search and gui send us a quit then quit will set to true 
-    // and we will do all cleanup and exit right inside the search and close the program
-
-    //if stop is sent then will stop searching and  stop will set true and simplely recursively
-    // back out of search wihtout updating any score or something   and let these value maintain its best from 
-    // previous iteration
-
-    float fail_high=0,fail_high_first=0;// will use for move ordereing short  form fh and fhf 
-    //One is the nember of times we get > beta on the first move, the other is the total > beta counts.
-    // It gives you an idea of how good your move ordering is. You want to be > 90%
-
-    int game_mode=0;
-    int post_thinking=0;
-};
-
-class s_board {
-    public:
-
-    int side,enpass,fiftymove,ply,hisply,castle_perm;
-    u64 poskey;
-    
-    vector<int>pieces=vector<int>(board_sq_num);
-    vector<u64>pawns=vector<u64>(3);
-    vector<int>king_sq=vector<int>(2);
-
-    vector<int>piece_num=vector<int>(13);
-
-    vector<int>big_pieces=vector<int>(2);
-    vector<int>major_pieces=vector<int>(2);
-    vector<int>minor_pieces=vector<int>(2);
-    vector<int>material=vector<int>(2);
-
-    vector<s_undo>history=vector<s_undo>(maxmoves);
-   
-    vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
-
-    s_pvtable pvtable[1];
-    //vector<s_pvtable>pvtable=vector<s_pvtable>(1);
-    vector<int>pvarray=vector<int>(maxdepth);
-    //fill the pv array upto maxdepth with the moves from the table 
-    // jo move alpha ko beat kre vo to hona hi chihiye isme 
-    // best line in the tree other line bhi hogi store  way through the tree
-    //getpvline fun se()  pvtable.cpp ki
-    // we will get our arrray out of pvtable into pvarray before printing
-
-
-    //history heuristic related to search
-    vector<vector<int>>search_history=vector<vector<int>>(13,vector<int>(board_sq_num));
-    // this basically set values 0 if move beat alpha
-   // when a piece move beat alpha  for that piece type  its to sq we will increment this array by 1
-    vector<vector<int>>search_killer=vector<vector<int>>(2,vector<int>(maxdepth));
-    // it stores 2 moves that recently caused beta cutoff
-    // non captyre moves ke liye h ye 2 array bs
-    // we will use these 2 array for move ordering in alpha beta
-};
-
 #define from_sq(m)    ((m) & 0x7F )
 #define to_sq(m)    (((m)>>7) & 0x7F )
 
@@ -192,6 +71,153 @@ class s_board {
 #define is_ki(p) (piece_king[(p)])
 
 #define mirror64(sq) (mirror[sq])
+
+#define infinite 30000
+#define is_mate (infinite-maxdepth)
+
+enum piece{emptyy,wp,wn,wb,wr,wq,wk,bp,bn,bb,br,bq,bk};
+enum file{fa,fb,fc,fd,fe,ff,fg,fh,fn};
+enum rank{r1,r2,r3,r4,r5,r6,r7,r8,rn};
+enum color{white,black,both};
+
+enum board120{
+    a1=21,b1,c1,d1,e1,f1,g1,h1,
+    a2=31,b2,c2,d2,e2,f2,g2,h2,
+    a3=41,b3,c3,d3,e3,f3,g3,h3,
+    a4=51,b4,c4,d4,e4,f4,g4,h4,
+    a5=61,b5,c5,d5,e5,f5,g5,h5,
+    a6=71,b6,c6,d6,e6,f6,g6,h6,
+    a7=81,b7,c7,d7,e7,f7,g7,h7,
+    a8=91,b8,c8,d8,e8,f8,g8,h8,no_sq,OFFBOARD
+};
+
+enum castle{wkca=1,wqca=2,bkca=4,bqca=8};
+
+enum mode{uci_mode,xboard_mode,console_mode};
+
+enum flags{hf_none,hf_alpha,hf_beta,hf_exact};
+
+class s_move{
+    public:
+
+    int move;
+    int score;
+};
+
+class s_movelist{
+    public:
+    
+    int count;//count of the number of move on the movelist
+    vector<s_move>moves=vector<s_move>(max_position_on_moves);
+};
+
+// from now on pv_entry is hash_entry
+// s_pvtavle is s_hash_table
+// we wrere earlier storing in pv table
+
+// class s_hash_entry{// if we find move that beat alpha then we store move and poskey that led to that move
+//     public:
+
+//     u64 poskey;
+//     int move;
+// };
+
+// class s_hash_table{// actual class for the table 
+//     public:
+
+//     s_hash_entry * ptable;// we will allocate momeory to this pointer depending on how many entries we want to store
+//     int num_entries;
+// };
+
+// we will ad a transpose/hash table for the pos that already been searched and store the score 
+//so if again search  AND again same score then we can directly retrun the score  no need to search again
+class s_hash_entry{// if we find move that beat alpha then we store move and poskey that led to that move
+    public:
+
+    u64 poskey;
+    int move, score, depth, flag;// willl store alpha beta exact flag enums h
+};
+
+class s_hash_table{// actual class for the table 
+    public:
+
+    s_hash_entry * ptable;// we will allocate momeory to this pointer depending on how many entries we want to store
+    int num_entries, new_write, over_write, hit, cut;
+};
+
+class s_undo{
+    public:
+
+    int moves,castle_perm,enpass,fiftymove;
+    u64 poskey;
+};
+
+class s_search_info{
+    public:
+
+    // time westart searching,depth set means we only search to certain depth acc to protocol
+    //
+    int start_time=0,stop_time=0,depth=0,depth_set=0,time_set=0;
+    int moves_to_go=0,infinitee=0;
+    
+    long nodes;// count of the pos that engine visit in search tree
+    int quit=0,stopped=0;
+    // get intrupted during a search and gui send us a quit then quit will set to true 
+    // and we will do all cleanup and exit right inside the search and close the program
+
+    //if stop is sent then will stop searching and  stop will set true and simplely recursively
+    // back out of search wihtout updating any score or something   and let these value maintain its best from 
+    // previous iteration
+
+    float fh=0,fhf=0;// will use for move ordereing short  form fh and fhf 
+    //One is the nember of times we get > beta on the first move, the other is the total > beta counts.
+    // It gives you an idea of how good your move ordering is. You want to be > 90%
+
+    int game_mode=0;
+    int post_thinking=0;
+    int null_cut;
+};
+
+class s_board {
+    public:
+
+    int side,enpass,fiftymove,ply,hisply,castle_perm;
+    u64 poskey;
+    
+    vector<int>pieces=vector<int>(board_sq_num);
+    vector<u64>pawns=vector<u64>(3);
+    vector<int>king_sq=vector<int>(2);
+
+    vector<int>piece_num=vector<int>(13);
+
+    vector<int>big_pieces=vector<int>(2);
+    vector<int>major_pieces=vector<int>(2);
+    vector<int>minor_pieces=vector<int>(2);
+    vector<int>material=vector<int>(2);
+
+    vector<s_undo>history=vector<s_undo>(maxmoves);
+   
+    vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
+
+    s_hash_table pvtable[1];
+    //vector<s_hash_table>pvtable=vector<s_hash_table>(1);
+    vector<int>pvarray=vector<int>(maxdepth);
+    //fill the pv array upto maxdepth with the moves from the table 
+    // jo move alpha ko beat kre vo to hona hi chihiye isme 
+    // best line in the tree other line bhi hogi store  way through the tree
+    //getpvline fun se()  pvtable.cpp ki
+    // we will get our arrray out of pvtable into pvarray before printing
+
+
+    //history heuristic related to search
+    vector<vector<int>>search_history=vector<vector<int>>(13,vector<int>(board_sq_num));
+    // this basically set values 0 if move beat alpha
+   // when a piece move beat alpha  for that piece type  its to sq we will increment this array by 1
+    vector<vector<int>>search_killer=vector<vector<int>>(2,vector<int>(maxdepth));
+    // it stores 2 moves that recently caused beta cutoff
+    // non captyre moves ke liye h ye 2 array bs
+    // we will use these 2 array for move ordering in alpha beta
+};
 
 extern vector<int> sq120to64;
 extern vector<int> sq64to120;
@@ -280,6 +306,8 @@ extern void mirror_eval_test(s_board *pos);
 //makemove.cpp
 extern int make_move(s_board * pos,int move);
 extern void take_move(s_board *pos);
+extern void make_null_move(s_board * pos);
+extern void take_null_move(s_board *pos);
 
 //perft.cpp
 extern void perft_test(int depth, s_board *pos);
@@ -292,8 +320,8 @@ extern int get_time_ms();
 //extern void read_input(s_search_info *info);
 
 //pvtable.cpp
-extern void init_pvtable(s_pvtable * table);
-extern void clear_pvtable(s_pvtable * table);
+extern void init_hash_table(s_hash_table * table);
+extern void clear_hash_table(s_hash_table * table);
 extern int probe_pvtable(const s_board* pos);
 extern void store_pvmove(const s_board* pos, const int move);
 extern int get_pvline(const int depth,s_board* pos);
