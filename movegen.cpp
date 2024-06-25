@@ -5,7 +5,7 @@
 using namespace std;
 
 #define move(f,t,ca,pro,flag) ((f)|((t)<<7)|(ca<<14)|(pro<<20)|(flag))
-#define square_offboard(sq) (file_board[(sq)]==OFFBOARD)
+#define square_offboard(sq) (file_board[(sq)]==off_board)
 
 const vector<int> loop_slide_piece{wb,wr,wq,0,bb,br,bq,0};
 const vector<int> loop_slide_index{0,4};

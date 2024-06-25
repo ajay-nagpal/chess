@@ -3,8 +3,38 @@
 #include<iostream>
 using namespace std;
 
+int movelist_ok(const s_movelist *list,  const s_board *pos) {
+	if(list->count < 0 || list->count >= max_pos_moves) {
+		return false;
+	}
+
+	int move_num;
+	int from = 0;
+	int to = 0;
+	for(move_num = 0; move_num < list->count; ++move_num) {
+		to = to_sq(list->moves[move_num].move);
+		from = from_sq(list->moves[move_num].move);
+		if(!sq_on_board(to) || !sq_on_board(from)) {
+			return false;
+		}
+		if(!piece_valid(pos->pieces[from])) {
+			print_board(pos);
+			return false;
+		}
+	}
+	return true;
+}
+
+int is_sq_120(const int sq) {
+	return (sq>=0 && sq<120);
+}
+
+int piece_valid_empty_off(const int pce) {
+	return (piece_valid_empty(pce) || pce == off_board);
+}
+
 int  sq_on_board(const int sq){
-    return file_board[sq]==OFFBOARD?0:1;
+    return file_board[sq]==off_board?0:1;
 }
 
 int side_valid(const int side){
@@ -62,3 +92,37 @@ void mirror_eval_test(s_board *pos) {
         }
     }
 }
+
+// void debug_analysis_test(s_board *pos, s_search_info *info) {
+
+// 	ifstream file("lct2.epd");
+//     string line;
+
+// 	info->depth = maxdepth;
+// 	info->time_set = true;
+// 	int time = 1140000;
+
+
+//     if(!file.is_open()) {
+//          cout<< "file not found" << endl;
+//         return;
+//     }  
+//     else {
+//         while(getline(file,line)){
+
+// 			info->start_time = get_time_ms();
+// 			info->stop_time = info->start_time + time;
+
+// 			clear_hash_table(pos->hash_table);
+
+//             const char * fen=line.c_str();
+//             parse_fen(fen, pos);
+
+//             cout<<line<<endl;
+// 			cout<<"time: "<<time<<" start: "<<info->start_time<< " stop: "<<info->stop_time<<
+//                   " depth: "<<info->depth<< "timeset: "<<info->time_set<<endl;
+// 			search_pos(pos, info);
+//         }
+//     }
+// }
+

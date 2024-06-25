@@ -27,6 +27,10 @@ static void pick_next_move(int move_num,s_movelist * list){
             best_score=list->moves[index].score;
             best_num=index;
         }
+        
+        ASSERT(move_num>=0 && move_num<list->count);
+        ASSERT(best_num>=0 && best_num<list->count);
+        ASSERT(best_num>=move_num);
 
         temp=list->moves[move_num];
         list->moves[move_num]=list->moves[best_num];
@@ -44,6 +48,7 @@ static int is_repetition(const s_board * pos){
     //history ki las entry se 1 km
     for(index=pos->hisply-pos->fiftymove;index<pos->hisply-1;index++){
         ASSERT(index>=0 && index<maxmoves);
+
         if(pos->poskey==pos->history[index].poskey){
             return true;
         }
@@ -68,14 +73,14 @@ static void clear_for_search(s_board * pos,s_search_info * info){
             pos->search_killer[index][index2]=0;
         }
     }
-    clear_hash_table(pos->pvtable);// for new search clear old pv
-
     pos->ply=0;// number of half moves played in the current search  so =0 before every search
 
+    pos->hash_table->over_write=0;
+    pos->hash_table->hit=0;
+    pos->hash_table->cut=0;
     //info->start_time=get_time_ms();//  uci.cpp parse go me set krenfge baad me
     info->stopped=0;// if interrupt of stoop search then 1
     info->nodes=0;
-
     info->fh=0;
     info->fhf=0;
 }
@@ -118,7 +123,7 @@ static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
     int old_alpha=alpha;// if we will found new alpha witch beat new alpha then we will sotre  best move found in pv cz we beat the old alpha we found new best move
     int best_move=nomove;
     score=-infinite;
-    int pvmove=probe_pvtable(pos);
+    int pvmove=probe_pvmove(pos);
 
     for(move_num=0;move_num<list->count;move_num++){
         pick_next_move(move_num,list);
@@ -144,13 +149,15 @@ static int quiscence(int alpha,int beta,s_board * pos,s_search_info * info){
                 return beta;
             }
             alpha =score;
-            best_move=list->moves[move_num].move;
+            //best_move=list->moves[move_num].move;
         }
     }
 
-    if(alpha!=old_alpha){
-        store_pvmove(pos,best_move);
-    }
+    // if(alpha!=old_alpha){
+    //     store_hash_entry(pos,best_move);
+    // }
+
+    ASSERT(alpha>=old_alpha);
     return alpha;
 }
 
@@ -160,7 +167,7 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     // do_numm is a permission wheather we can make null move or not
     
     ASSERT(check_board(pos));
-    if(depth==0){
+    if(depth<=0){
         return quiscence(alpha,beta,pos,info);
         // info->nodes++;
         // return eval_pos(pos);
@@ -189,11 +196,10 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
     int score =-infinite;// prep for null move
     int pvmove=nomove;
 
-    if( probe_hash_entry(pos, &pvmove, &score, alpha, beta, depth) == true ) {
+    if( probe_hash_entry(pos, pvmove,score, alpha, beta, depth) == true ) {
 		pos->hash_table->cut++;
 		return score;
 	}
-
 
     if(do_null && !in_check && pos->ply && (pos->big_pieces[pos->side]>0) && depth>=4){
         //chceking pos->ply menas we made atleast 1 move
@@ -205,8 +211,8 @@ static int alpha_beta(int alpha, int beta, int depth,s_board * pos,s_search_info
 		if(info->stopped == true){
 			return 0;
 		}
-        if (score >= beta) {
-			//info->null_cut++;
+        if (score >= beta && abs(score)<is_mate) {
+			info->null_cut++;
 			return beta;
 		}
     }

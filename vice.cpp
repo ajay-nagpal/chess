@@ -10,12 +10,15 @@ using namespace std;
 #define wac1 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
 
 int main(){
-    AllInit();
+    all_init();
     
     s_board pos[1];
     s_search_info info[1];
-    init_hash_table(pos->pvtable);
-    
+    info->quit=false;
+    pos->hash_table->ptable=NULL;
+
+    init_hash_table(pos->hash_table,64);
+
     cout<<"welcome to Vice!. type 'vice' for console mode..."<<endl;
     string line;
 
@@ -46,7 +49,7 @@ int main(){
         }
     }
     //uci_loop(); // to check till uci
-    delete(pos->pvtable->ptable);
+    delete(pos->hash_table->ptable);
     return 0;
 }
 

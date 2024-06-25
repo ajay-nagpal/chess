@@ -150,8 +150,8 @@ void init_file_rank_board(){
     int sq=a1,sq64=0;
 
     for(index=0;index<board_sq_num;index++){
-        file_board[index]=OFFBOARD;
-        rank_board[index]=OFFBOARD;
+        file_board[index]=off_board;
+        rank_board[index]=off_board;
     }
 
     for(rank=r1;rank<=r8;rank++){
@@ -225,7 +225,7 @@ void initsq120to64(){
     }
 }
 
-void AllInit(){
+void all_init(){
 
     initsq120to64();
 

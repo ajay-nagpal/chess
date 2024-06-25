@@ -30,7 +30,7 @@ int square_attacked(const int sq,const int side, const s_board *pos){
     // knights
     for(index=0;index<8;index++){// looping through 8 knight direction
         piece=pos->pieces[sq+knight_dir[index]];
-        if(piece!=OFFBOARD && is_kn(piece) && piece_color[piece]==side){
+        if(piece!=off_board && is_kn(piece) && piece_color[piece]==side){
             return true;
         }
     }
@@ -40,7 +40,7 @@ int square_attacked(const int sq,const int side, const s_board *pos){
         temp_sq=sq+dir;
         piece=pos->pieces[temp_sq];
 
-        while(piece!=OFFBOARD){
+        while(piece!=off_board){
             if(piece!=emptyy){
                 if(is_rq(piece)  && piece_color[piece]==side){
                     return true;
@@ -57,7 +57,7 @@ int square_attacked(const int sq,const int side, const s_board *pos){
         temp_sq=sq+dir;
         piece=pos->pieces[temp_sq];
 
-        while(piece!=OFFBOARD){
+        while(piece!=off_board){
             if(piece!=emptyy){
                 if(is_bq(piece)  && piece_color[piece]==side){
                     return true;
@@ -72,7 +72,7 @@ int square_attacked(const int sq,const int side, const s_board *pos){
 
     for(index=0;index<8;index++){
         piece=pos->pieces[sq+king_dir[index]];
-        if(piece!=OFFBOARD && is_ki(piece) && piece_color[piece]==side)
+        if(piece!=off_board && is_ki(piece) && piece_color[piece]==side)
             return true;
     }
 

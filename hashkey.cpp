@@ -12,7 +12,7 @@ u64 generate_pos_key(const s_board *pos){
     for(sq=0;sq<board_sq_num;sq++){
         piece=pos->pieces[sq];
 
-        if(piece!=no_sq && piece!=emptyy && piece!=OFFBOARD){
+        if(piece!=no_sq && piece!=emptyy && piece!=off_board){
             ASSERT(piece>=wp && piece<=bk);
             finalkey ^= piece_keys[piece][sq];
         }

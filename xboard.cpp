@@ -190,7 +190,17 @@ void xboard_loop(s_board * pos, s_search_info * info){
             cout<<"debug movetime: "<<move_time<<endl;
             continue;
         }
-
+        if(command=="memory"){
+            index=line.find("memory");
+            mb=stoi(line.substr(index+7));
+            if(mb<4)
+                mb=4;
+            if(mb>max_hash)
+                mb=max_hash;
+            cout<<"set hash to "<<mb<<" mb"<<endl;
+            init_hash_table(pos->hash_table,mb);
+            continue;
+        }
         if(command=="time"){
             index=line.find("time");
             move_time=stoi(line.substr(index+5));

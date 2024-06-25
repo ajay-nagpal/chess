@@ -126,15 +126,12 @@ void uci_loop(s_board * pos, s_search_info * info){
 
     cout<<"id name "<<NAME<<endl;
     cout<<"id author Ajay"<<endl;
+    cout<<"option name Hash type spin default 64 min 4 max "<<max_hash<<endl;
+	cout<<"option name Book type check default true "<<endl;
     cout<<"uci ok"<<endl;
 
-    // is uci me hmne kiya pass
-    // main me define krek send kreng e as an argument
-    //s_board pos[1];
-    //s_search_info info[1];
-    //init_hash_table(pos->pvtable);
-
     string line;
+    int mb=64;
 
     while(1){
         
@@ -163,10 +160,24 @@ void uci_loop(s_board * pos, s_search_info * info){
             cout<<"id author Ajay"<<endl;
             cout<<"uci ok"<<endl;
         }
+        else if(line=="debug"){
+            //debug_analysis_test(pos,info);
+            break;
+        }
+        else if(line=="setoption name hash value"){
+            size_t index=line.find("value");
+            mb=stoi(line.substr(index+6));
+            if(mb<4)
+                mb=4;
+            if(mb>max_hash)
+                mb=max_hash;
+            cout<<"set hash to "<<mb<<" mb"<<endl;
+            init_hash_table(pos->hash_table,mb);
+        }
         if(info->quit){
             break;
         }
     }
     // isliye iske bhi jrrort nhi main me kr denge jha se pass hoga
-    //delete(pos->pvtable->ptable);
+    //delete(pos->hash_table->ptable);
 }

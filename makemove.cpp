@@ -131,7 +131,7 @@ static void move_piece(const int from, const int to, s_board * pos){
     int piece=pos->pieces[from];// from ke piece konsa h and color konsa h
     int color=piece_color[piece];
 
-    #ifdef DEBUG
+    #ifdef debug
         int t_piece_num=false;// we must find a piece from out piece list with same value as from
         //if we dont then this will stay false
     #endif
@@ -155,13 +155,13 @@ static void move_piece(const int from, const int to, s_board * pos){
     for(index=0;index<pos->piece_num[piece];index++){
         if(pos->piece_list[piece][index]==from){
             pos->piece_list[piece][index]=to;
-    #ifdef DEBUG
+    #ifdef debug
                 t_piece_num=true;// set it true
     #endif
                 break;
         }
     }
-    ASSERT(t_piece_num);// we must do assert cz we must found the from piece
+    ASSERT(t_piece_num);// we must do ASSERT cz we must found the from piece
     // if we dont then out piece list dont matches with out pieces array
 }
 
@@ -218,7 +218,7 @@ int make_move(s_board * pos,int move){
                 move_piece(h8,f8,pos);
                 break;
             default: 
-                ASSERT(false);// if not then castling move has illegle to square so we senfd assert false
+                ASSERT(false);// if not then castling move has illegle to square so we senfd ASSERT false
                 break;
         }
     }
@@ -288,7 +288,7 @@ int make_move(s_board * pos,int move){
     int prom_piece=promoted(move);
     if(prom_piece!=emptyy){
        
-        // assert that it is a piece and  also not a pawn cz we cant be promoting to a pawn
+        // ASSERT that it is a piece and  also not a pawn cz we cant be promoting to a pawn
         ASSERT(piece_valid(prom_piece)  &&  !piece_pawn[prom_piece]);
         
         clear_piece(to,pos);// clear the piece first and on the to square
@@ -303,7 +303,7 @@ int make_move(s_board * pos,int move){
     pos->side^=1;// now change the side
     hash_side;// hash in the side
 
-    // we are done making all our move and changes on baord so assert checkboard again
+    // we are done making all our move and changes on baord so ASSERT checkboard again
     ASSERT(check_board(pos));
    
     if(square_attacked(pos->king_sq[side],pos->side,pos)){

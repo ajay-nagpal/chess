@@ -101,7 +101,7 @@ int parse_fen( const char* fen ,s_board * pos){
     ASSERT(pos->castle_perm>=0 && pos->castle_perm<=15 );
 
     if(*fen !='-'){// enpass hoga to ek letter aur ek number hoga to next step
-        file=fen[0]-'a'; // to vo a to h ya 1 to  8 hoga to extract krke assert se check
+        file=fen[0]-'a'; // to vo a to h ya 1 to  8 hoga to extract krke ASSERT se check
         rank=fen[1]-'1';
 
         cout<<endl<<file<<" "<<rank<<endl;
@@ -123,7 +123,7 @@ void reset_board(s_board *pos){
     int index=0;
 
     for(index=0;index<board_sq_num;index++)
-        pos->pieces[index]=OFFBOARD;
+        pos->pieces[index]=off_board;
 
     for(index=0;index<64;index++)
         pos->pieces[SQ120(index)]=emptyy;
@@ -199,7 +199,7 @@ void update_list_material(s_board *pos){
         sq=index;
         piece=pos->pieces[index];
 
-        if(piece!=OFFBOARD && piece!=emptyy){
+        if(piece!=off_board && piece!=emptyy){
             color=piece_color[piece];
 
             if(piece_big[piece]==true)

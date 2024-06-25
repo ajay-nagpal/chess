@@ -7,9 +7,9 @@
 
 using namespace std;
 
-#define DEBUG
+#define debug
 
-#ifndef DEBUG
+#ifndef debug
 #define ASSERT(n)
 #else
 #define ASSERT(n) \
@@ -31,8 +31,8 @@ typedef unsigned long long u64;
 #define maxmoves 2048// half moves
 
 #define maxdepth 64
-
-#define max_position_on_moves 256// 1 given pos pr max move itne ho skte h
+#define max_hash 1024
+#define max_pos_moves 256// 1 given pos pr max move itne ho skte h
 
 #define start_fen "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -88,7 +88,7 @@ enum board120{
     a5=61,b5,c5,d5,e5,f5,g5,h5,
     a6=71,b6,c6,d6,e6,f6,g6,h6,
     a7=81,b7,c7,d7,e7,f7,g7,h7,
-    a8=91,b8,c8,d8,e8,f8,g8,h8,no_sq,OFFBOARD
+    a8=91,b8,c8,d8,e8,f8,g8,h8,no_sq,off_board
 };
 
 enum castle{wkca=1,wqca=2,bkca=4,bqca=8};
@@ -108,7 +108,7 @@ class s_movelist{
     public:
     
     int count;//count of the number of move on the movelist
-    vector<s_move>moves=vector<s_move>(max_position_on_moves);
+    vector<s_move>moves=vector<s_move>(max_pos_moves);
 };
 
 // from now on pv_entry is hash_entry
@@ -199,7 +199,7 @@ class s_board {
    
     vector<vector<int>>piece_list=vector<vector<int>>(13,vector<int>(10));
 
-    s_hash_table pvtable[1];
+    s_hash_table hash_table[1];
     //vector<s_hash_table>pvtable=vector<s_hash_table>(1);
     vector<int>pvarray=vector<int>(maxdepth);
     //fill the pv array upto maxdepth with the moves from the table 
@@ -261,7 +261,7 @@ extern vector<u64> white_passed_mask;
 extern vector<u64> isolated_mask;
 
 //init.cpp
-extern void AllInit();
+extern void all_init();
 extern void init_file_rank_board();
 
 //bitboard.cpp
@@ -296,12 +296,16 @@ extern int move_exist(s_board * pos,const int move);
 extern void init_mvvlva();
 
 //validate.cpp
+extern int movelist_ok(const s_movelist *list,  const s_board *pos);
+extern int is_sq_120(const int sq);
+extern int piece_valid_empty_off(const int pce);
 extern int sq_on_board(const int sq);
 extern int side_valid(const int side);
 extern int file_rank_valid(const int fr);
 extern int piece_valid_empty(const int piece);
 extern int piece_valid(const int piece);
 extern void mirror_eval_test(s_board *pos);
+//extern void debug_analysis_test(s_board *pos, s_search_info *info);
 
 //makemove.cpp
 extern int make_move(s_board * pos,int move);
@@ -320,17 +324,17 @@ extern int get_time_ms();
 //extern void read_input(s_search_info *info);
 
 //pvtable.cpp
-extern void init_hash_table(s_hash_table * table);
+extern void init_hash_table(s_hash_table * table,const int mb);
 extern void clear_hash_table(s_hash_table * table);
-extern int probe_pvtable(const s_board* pos);
-extern void store_pvmove(const s_board* pos, const int move);
-extern int get_pvline(const int depth,s_board* pos);
+extern int  probe_pvmove(const s_board* pos);
+extern void store_hash_entry(s_board* pos, const int move,int score,const int flag,const int depth);
+extern int  get_pvline(const int depth,s_board* pos);
+extern int  probe_hash_entry(s_board *pos, int &move, int &score, int alpha, int beta, int depth);
 
 //evaluate.cpp
 extern int eval_pos(const s_board * pos);
 
 //uci.cpp
-extern void uci_loop();
 extern void uci_loop(s_board * pos, s_search_info * info);
 
 //xboard.cpp
